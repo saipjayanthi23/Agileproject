@@ -16,7 +16,6 @@ public class Client {
 		try {
            myClient.connect(server, port);
            System.out.print(myClient.getReplyString());
-          
 
         // Check for reply code after attempting the connection
            
