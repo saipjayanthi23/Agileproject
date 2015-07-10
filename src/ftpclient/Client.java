@@ -62,6 +62,8 @@ public class Client {
 	        //Call to establish the connection with FTP server and login 
 	        
 	        serverLogin(myClient,server,port,user,pass);
+	        //close console 
+	        console.close();
 	         
 	}
 }
