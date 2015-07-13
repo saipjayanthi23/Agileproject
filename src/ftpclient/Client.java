@@ -6,6 +6,7 @@ import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 import org.apache.commons.net.ftp.FTPClient;
+import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
 public class Client {
@@ -49,6 +50,22 @@ public class Client {
            ex.printStackTrace();
        }
 		
+	}
+	
+	// Story 2
+	public static void logoff() {
+		
+		try {
+			if (myClient.isConnected())
+				myClient.disconnect();
+			else
+				myClient.logout();
+			System.exit(0);
+		} catch (FTPConnectionClosedException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+		 	e.printStackTrace();
+		}
 	}
         
 	//Story 3
@@ -94,7 +111,7 @@ public class Client {
 	}
 	
 	public static void main(String[] args) {
-	        String server = "www.yourserver.net";
+	        String server = "linux.cs.pdx.edu";
 	        int port = 21;
 	        Scanner console = new Scanner(System.in);
 	       
@@ -114,7 +131,8 @@ public class Client {
 	        boolean notquit = true;
 	        while(notquit){
 	        	System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
-	        			+ "2. List files and directories on local system (current directory)\n"
+	        			+ "2. List files and directories on local system (current directory.)\n"
+	        			+ "3. Logoff from server.\n"
 	        			+ "Q. Quit.");
 	        	String choice = console.nextLine();
 	        	switch(choice){
@@ -124,11 +142,12 @@ public class Client {
 	        	case "2": 	listLocalFiles();
 							break;
 	        				
-	        	//case "3": //do something
-	        	//			break;
+	        	case "3":  	logoff();
+	        				break;
 	        				
 	        	case "Q":
-	        	case "q": 	notquit = false; 
+	        	case "q": 	notquit = false;
+	        				logoff();
 	        				break;
 	        				
 	        	default: 	System.out.println("Did not understand your selection.");
@@ -136,6 +155,8 @@ public class Client {
 	        	}
 	        }
 	        System.out.println("Done");
+	        console.close();
+	        System.exit(0);
 	         
 	}
 }
