@@ -16,13 +16,12 @@ public class Client {
 	
 	
 	//Story 1
-	//public static void serverLogin(FTPClient myClient,String server,int port,String user,String pass){
-	public static void serverLogin(String server,int port,String user,String pass){
+	public static boolean serverConnect(String server,int port){
         
 		// Attempting to connect with FTP server
-		
+		boolean reply=false;
 		try {
-           myClient.connect(server, port);
+           myClient.connect(server,port);
            System.out.print(myClient.getReplyString());
 
         // Check for reply code after attempting the connection
@@ -33,25 +32,37 @@ public class Client {
               System.err.println("Connection failed. Server reply code: " + replyCode);
               System.exit(1);
            }
-        
-        // Attempting to login
-           
-           boolean success = myClient.login(user, pass);
-           System.out.print(myClient.getReplyString());
-           if (!success) {
-               System.out.println("Authentication failed. Could not login into server");
-               return;
-           } else {
-               System.out.println("Success!!Logged into server");
+           else{
+        	   reply=true;
            }
-       
 		} catch (IOException ex) {
+			System.out.println("serverConnect(): Unexpected exception");
+           ex.printStackTrace();
+       }
+	   return reply;
+	}	
+       
+	// Attempting to login
+	public static boolean serverLogin(String user,String pass){ 
+		boolean res=false;
+        try {
+		     boolean success = myClient.login(user, pass);
+             System.out.print(myClient.getReplyString());
+             if (!success) {
+                System.out.println("Incorrect Credentials");
+                
+             } else {
+               System.out.println("Success!!Logged into server");
+               res=true;
+             }
+    	} catch (IOException ex) {
 			System.out.println("serverLogin(): Unexpected exception");
            ex.printStackTrace();
        }
+	    return res;       
+	}   
 		
-	}
-	
+		
 	// Story 2
 	public static void logoff() {
 		
@@ -60,7 +71,7 @@ public class Client {
 				myClient.disconnect();
 			else
 				myClient.logout();
-			System.exit(0);
+		  System.exit(0);
 		} catch (FTPConnectionClosedException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -111,25 +122,41 @@ public class Client {
 	}
 	
 	public static void main(String[] args) {
-	        String server = "linux.cs.pdx.edu";
+	        
+		    String server = "linux.cs.pdx.edu";
 	        int port = 21;
+	        boolean connectres=false;
+	        boolean loginres=false;
+	        
 	        Scanner console = new Scanner(System.in);
-	       
-	        //Getting login details from the user
 	        
-	        System.out.println("Enter the username");
-	        String user = console.nextLine();
-	        
-	        System.out.println("Enter the password");
-	        String pass = console.nextLine();
-	        
+	      //Call to establish the connection with FTP server
 	        myClient = new FTPClient();
 	        
-	        //Call to establish the connection with FTP server and login 
+	        connectres=serverConnect(server,port);
+	        if(!connectres)
+	        	System.exit(0);
 	        
-	        serverLogin(server,port,user,pass);
+	        //Getting login details from the user. 
+	        for (int i=1;i<=3;i++){
+	        	System.out.println("Enter the username");
+		        String user = console.nextLine();
+		        
+		        System.out.println("Enter the password");
+		        String pass = console.nextLine();
+		        
+		        loginres= serverLogin(user,pass);
+		        if(loginres)
+		          break;
+		        else
+		          if (i==3)
+		        	  System.exit(0);
+		          else 
+		        	  continue;
+		     }
+		           
 	        boolean notquit = true;
-	        while(notquit){
+	        while(loginres && notquit){
 	        	System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
 	        			+ "2. List files and directories on local system (current directory.)\n"
 	        			+ "3. Logoff from server.\n"
