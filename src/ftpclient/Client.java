@@ -1,4 +1,5 @@
 package src.ftpclient;
+import java.io.File;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -12,6 +13,8 @@ public class Client {
 	
 	// Method to establish the connection with FTP server and login with user details
 	
+	
+	//Story 1
 	//public static void serverLogin(FTPClient myClient,String server,int port,String user,String pass){
 	public static void serverLogin(String server,int port,String user,String pass){
         
@@ -48,7 +51,7 @@ public class Client {
 		
 	}
         
-	
+	//Story 3
 	public static void listRemoteFiles(){
 		System.out.println("listRemoteFiles");
 		// lists files and directories in the current working directory
@@ -74,9 +77,20 @@ public class Client {
 			System.out.println("listRemoteFiles(): Unexpected exception");
 			e.printStackTrace();
 		}
-		 
-
-
+	}
+	
+	//Story 4
+	public static void listLocalFiles(){
+		File curDir = new File(".");
+		File[] files = curDir.listFiles();
+	
+		for (File file : files) {
+		    String details = file.getName();
+		    if (file.isDirectory()) {
+		        details = "[" + details + "]";
+		    }	    
+		    System.out.println(details);
+		}
 	}
 	
 	public static void main(String[] args) {
@@ -99,13 +113,18 @@ public class Client {
 	        serverLogin(server,port,user,pass);
 	        boolean notquit = true;
 	        while(notquit){
-	        	System.out.println("Pick an option:\n1. List files and directories on remote.\nQ. Quit.");
+	        	System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
+	        			+ "2. List files and directories on local system (current directory)\n"
+	        			+ "Q. Quit.");
 	        	String choice = console.nextLine();
 	        	switch(choice){
 	        	case "1": 	listRemoteFiles();
 	        				break;
+	        	
+	        	case "2": 	listLocalFiles();
+							break;
 	        				
-	        	//case "2": //do something
+	        	//case "3": //do something
 	        	//			break;
 	        				
 	        	case "Q":
