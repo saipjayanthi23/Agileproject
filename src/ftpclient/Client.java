@@ -1,5 +1,6 @@
 package src.ftpclient;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -121,9 +122,39 @@ public class Client {
 		}
 	}
 	
+	
+	
+	
+	//Story 5
+	//get file from remote server
+	public static void fileDownload(){
+		FileOutputStream fileOutputstream = null;
+		Scanner scanner = new Scanner(System.in);
+		try{
+			System.out.println("Enter the filename you want to download");
+	        
+			String remotefilename = scanner.nextLine();
+			fileOutputstream = new FileOutputStream(remotefilename);
+            myClient.retrieveFile("/" + remotefilename, fileOutputstream);
+		}catch(IOException e) {
+            e.printStackTrace();
+		}finally {
+            try {
+                if (fileOutputstream != null) {
+                	fileOutputstream.close();
+                }
+                
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+		scanner.close();
+	}
+	
+	
 	public static void main(String[] args) {
 	        
-		    String server = "linux.cs.pdx.edu";
+		    String server = "71.237.177.239";
 	        int port = 21;
 	        boolean connectres=false;
 	        boolean loginres=false;
