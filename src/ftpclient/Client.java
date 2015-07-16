@@ -70,8 +70,11 @@ public class Client {
 		try {
 			if (myClient.isConnected())
 				myClient.disconnect();
+			
 			else
 				myClient.logout();
+			
+		  System.out.println("Successfully Logged out from server!!!");	
 		  System.exit(0);
 		} catch (FTPConnectionClosedException e) {
 			e.printStackTrace();
