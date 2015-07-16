@@ -10,6 +10,8 @@ import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
+
+
 public class Client {
 	static FTPClient myClient;
 	
@@ -75,7 +77,7 @@ public class Client {
 				myClient.logout();
 			
 		  System.out.println("Successfully Logged out from server!!!");	
-		  System.exit(0);
+		  //System.exit(0);
 		} catch (FTPConnectionClosedException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
@@ -158,7 +160,8 @@ public class Client {
 	public static void main(String[] args) {
 	        
 		    String server = "71.237.177.239";
-	        int port = 21;
+	        
+		    int port = 21;
 	        boolean connectres=false;
 	        boolean loginres=false;
 	        
@@ -175,9 +178,19 @@ public class Client {
 	        for (int i=1;i<=3;i++){
 	        	System.out.println("Enter the username");
 		        String user = console.nextLine();
+		        while(user.equals("") || user.trim().isEmpty()){
+		        	System.out.println("Username cannot be blank");
+		        	System.out.println("Enter the username");
+			        user = console.nextLine();
+		        }
 		        
 		        System.out.println("Enter the password");
 		        String pass = console.nextLine();
+		        while(pass.equals("") || pass.trim().isEmpty()){
+		        	System.out.println("Password cannot be blank");
+		        	System.out.println("Enter the password");
+			        pass = console.nextLine();
+		        }
 		        
 		        loginres= serverLogin(user,pass);
 		        if(loginres)
