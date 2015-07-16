@@ -82,7 +82,7 @@ public class Client {
         
 	//Story 3
 	public static void listRemoteFiles(){
-		System.out.println("listRemoteFiles");
+		System.out.println("list Remote Files");
 		// lists files and directories in the current working directory
 		// Can't test without a connection
 		FTPFile[] files;
@@ -191,6 +191,7 @@ public class Client {
 	        	System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
 	        			+ "2. List files and directories on local system (current directory.)\n"
 	        			+ "3. Logoff from server.\n"
+	        			+ "4. Get file from remote server.\n"
 	        			+ "Q. Quit.");
 	        	String choice = console.nextLine();
 	        	switch(choice){
@@ -202,6 +203,9 @@ public class Client {
 	        				
 	        	case "3":  	logoff();
 	        				break;
+	        				
+	        	case "4":  fileDownload();
+	        	           break;
 	        				
 	        	case "Q":
 	        	case "q": 	notquit = false;
