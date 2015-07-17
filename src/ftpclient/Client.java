@@ -220,8 +220,10 @@ public class Client {
 	        	case "3":  	logoff();
 	        				break;
 	        				
-	        	case "4":   listRemoteFiles();
+	        	case "4":   System.out.println("Here is the list of remote files");
+	        				listRemoteFiles();
 	        				fileDownload();
+	        				System.out.println("Here is updated list of local files");
 	        				listLocalFiles();
 	        	           break;
 	        				
