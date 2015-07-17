@@ -139,6 +139,10 @@ public class Client {
 			System.out.println("Enter the filename you want to download");
 	        
 			String remotefilename = scanner.nextLine();
+			////check if filename is blank
+			if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
+	        	System.out.println("filename cannot be blank");}
+			/////
 			fileOutputstream = new FileOutputStream(remotefilename);
             myClient.retrieveFile("/" + remotefilename, fileOutputstream);
 		}catch(IOException e) {
