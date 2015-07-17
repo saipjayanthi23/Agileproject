@@ -153,7 +153,7 @@ public class Client {
                 e.printStackTrace();
             }
         }
-		scanner.close();
+		//scanner.close();
 	}
 	
 	
@@ -220,7 +220,9 @@ public class Client {
 	        	case "3":  	logoff();
 	        				break;
 	        				
-	        	case "4":  fileDownload();
+	        	case "4":   listRemoteFiles();
+	        				fileDownload();
+	        				listLocalFiles();
 	        	           break;
 	        				
 	        	case "Q":
