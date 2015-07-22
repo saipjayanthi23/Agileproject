@@ -183,6 +183,58 @@ public class Client {
 		
 	}
 	
+	//story 9  create directories on remote server
+		public static void createDirectory(String dirName)
+		{
+			
+			Boolean replycode = null;
+			int ch = 0;
+			/* 
+			 * The following code will check if the user tries to enter nested directories
+			 * example Test\java. and if there are nested directories displays the appropriate messages
+			 * if not directory is created
+			 */
+			try
+			{
+				ch = dirName.indexOf('\\');
+								
+			}catch(StringIndexOutOfBoundsException e){
+				e.printStackTrace();
+			}
+			
+			
+			if(ch!=-1)
+			{
+				System.out.println("Nested Directories are not supported! Please try again");
+			}
+			else
+			{
+				
+				/*
+				 * The following code is to create the directory in the current directory on remote server
+				 */
+				try
+				{
+					replycode = myClient.makeDirectory(dirName);
+					System.out.print(myClient.getReplyString());
+					
+				}catch(IOException e)
+				{
+					e.printStackTrace();
+				}	
+				if (replycode)
+				{
+					listRemoteFiles();
+					System.out.println("Directory created Successfully: ");
+				
+				}
+				else
+				{
+					System.out.println("Failed to create directory");
+				}
+			}
+		}
+	
 	
 	public static void main(String[] args) {
 	        
@@ -243,7 +295,9 @@ public class Client {
 	        			+ "2. List files and directories on local system (current directory.)\n"
 	        			+ "3. Logoff from server.\n"
 	        			+ "4. Get a file from remote server. (download) \n"
-	        			+ "Q. Quit.");
+	        			+ "5. Create directory on remote server. \n"
+	        			);
+//	        			+ "Q. Quit.");
 	        	String choice = console.nextLine();
 	        	switch(choice){
 	        	case "1": 	listRemoteFiles();
@@ -261,10 +315,17 @@ public class Client {
 	        				fileDownload(f);
 	        				break;
 	        				
-	        	case "Q":
-	        	case "q": 	notquit = false;
-	        				logoff();
-	        				break;
+	        	case "5":   //Get the name of the directory to be created from user
+    						System.out.println ("Enter name of the directory to create:");
+    						String dirName = console.nextLine();
+    						createDirectory(dirName);
+    						break;
+    				
+	        				
+//	        	case "Q":
+//	        	case "q": 	notquit = false;
+//	        				logoff();
+//	        				break;
 	        				
 	        	default: 	System.out.println("Did not understand your selection.");
 	        	
