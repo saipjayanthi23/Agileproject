@@ -14,6 +14,7 @@ import org.apache.commons.net.ftp.FTPReply;
 
 public class Client {
 	static FTPClient myClient;
+	private static Scanner scanner;
 	
 	// Method to establish the connection with FTP server and login with user details
 	
@@ -134,10 +135,10 @@ public class Client {
 	//get file from remote server
 	public static void fileDownload(){
 		FileOutputStream fileOutputstream = null;
-		Scanner scanner = new Scanner(System.in);
 		try{
 			System.out.println("Enter the filename you want to download");
 	        
+			scanner = new Scanner(System.in);
 			String remotefilename = scanner.nextLine();
 			////check if filename is blank
 			if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
