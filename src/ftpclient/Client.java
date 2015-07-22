@@ -1,12 +1,16 @@
 package src.ftpclient;
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Scanner;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
@@ -134,44 +138,41 @@ public class Client {
 	//Story 5
 	//get file from remote server
 	static boolean checkFileExists(String filePath) throws IOException {
-	    InputStream inputStream = myClient.retrieveFileStream(filePath);
-	    int returnCode = myClient.getReplyCode();
-	    if (inputStream == null || returnCode == 550) {
-	        return false;
-	    }
-	    return true;
+		String[] files = myClient.listNames();
+		return Arrays.asList(files).contains(filePath);
 	}
-	public static void fileDownload(){
-		FileOutputStream fileOutputstream = null;
-		Scanner scanner = new Scanner(System.in);
-		
+	
+	public static void fileDownload(String remotefilename){
+		OutputStream outputstream = null;
+
 		try{
-			System.out.println("Enter the filename you want to download");
-	        
-			String remotefilename = scanner.nextLine();
-			//scanner.close();
-			
-		//check if file is present on remote directory
-			if(!checkFileExists(remotefilename)){
-	        	System.out.println("file not in remote directory please try again");
-	        	
+			//check if filename is blank
+			if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
+			        System.out.println("Filename cannot be blank. Please try again.\n");
+			        return;
+			}
+			//check if file is present on remote directory
+			else if(!checkFileExists(remotefilename)){
+	        	System.out.println("File not on remote server. Please try again.\n");
+	        	return;
 	        	}
-		
-		//check if filename is blank
-					if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
-			        	System.out.println("filename cannot be blank");
-			        	}
-				
-			fileOutputstream = new FileOutputStream(remotefilename);
-            myClient.retrieveFile("/" + remotefilename, fileOutputstream);
-		}catch(IOException e) {
+			else  {
+				outputstream = new BufferedOutputStream(new FileOutputStream(remotefilename));
+            	boolean success = myClient.retrieveFile(remotefilename, outputstream);
+            	outputstream.close();
+            	if (success)
+            		System.out.printf ("Download %s completed.\n", remotefilename);
+            	else
+            		System.out.printf ("Download %s FAILED.\n", remotefilename);
+			}
+		} catch(IOException e) {
             e.printStackTrace();
 		}finally {
 			
             try {
             	          
-                if (fileOutputstream != null) {
-                	fileOutputstream.close();
+                if (outputstream != null) {
+                	outputstream.close();
                 }
                 
             } catch (IOException e) {
@@ -193,7 +194,7 @@ public class Client {
 	        
 	        Scanner console = new Scanner(System.in);
 	        
-	      //Call to establish the connection with FTP server
+	        //Call to establish the connection with FTP server
 	        myClient = new FTPClient();
 	        
 	        connectres=serverConnect(server,port);
@@ -227,13 +228,21 @@ public class Client {
 		          else 
 		        	  continue;
 		     }
-		           
+		    
+	        // Need this for downloading
+	        try {
+	        	myClient.setFileType(FTP.BINARY_FILE_TYPE);
+	        	myClient.enterLocalPassiveMode();
+	        } catch (IOException e) {
+	        	e.printStackTrace();
+	        }
+	        
 	        boolean notquit = true;
 	        while(loginres && notquit){
 	        	System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
 	        			+ "2. List files and directories on local system (current directory.)\n"
 	        			+ "3. Logoff from server.\n"
-	        			+ "4. Get file from remote server.\n"
+	        			+ "4. Get a file from remote server. (download) \n"
 	        			+ "Q. Quit.");
 	        	String choice = console.nextLine();
 	        	switch(choice){
@@ -246,12 +255,11 @@ public class Client {
 	        	case "3":  	logoff();
 	        				break;
 	        				
-	        	case "4":   System.out.println("Here is the list of remote files");
-	        				listRemoteFiles();
-	        				fileDownload();
-	        				System.out.println("Here is updated list of local files");
-	        				listLocalFiles();
-	        	           break;
+	        	case "4":	//Getting a file from server
+	        				System.out.println ("Enter file name to download:");
+	        				String f = console.nextLine();
+	        				fileDownload(f);
+	        				break;
 	        				
 	        	case "Q":
 	        	case "q": 	notquit = false;
