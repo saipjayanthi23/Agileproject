@@ -1,5 +1,6 @@
 package src.ftpclient;
 import java.io.File;
+import java.io.InputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
@@ -132,23 +133,43 @@ public class Client {
 	
 	//Story 5
 	//get file from remote server
+	static boolean checkFileExists(String filePath) throws IOException {
+	    InputStream inputStream = myClient.retrieveFileStream(filePath);
+	    int returnCode = myClient.getReplyCode();
+	    if (inputStream == null || returnCode == 550) {
+	        return false;
+	    }
+	    return true;
+	}
 	public static void fileDownload(){
 		FileOutputStream fileOutputstream = null;
 		Scanner scanner = new Scanner(System.in);
+		
 		try{
 			System.out.println("Enter the filename you want to download");
 	        
 			String remotefilename = scanner.nextLine();
-			////check if filename is blank
-			if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
-	        	System.out.println("filename cannot be blank");}
-			/////
+			//scanner.close();
+			
+		//check if file is present on remote directory
+			if(!checkFileExists(remotefilename)){
+	        	System.out.println("file not in remote directory please try again");
+	        	
+	        	}
+		
+		//check if filename is blank
+					if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
+			        	System.out.println("filename cannot be blank");
+			        	}
+				
 			fileOutputstream = new FileOutputStream(remotefilename);
             myClient.retrieveFile("/" + remotefilename, fileOutputstream);
 		}catch(IOException e) {
             e.printStackTrace();
 		}finally {
+			
             try {
+            	          
                 if (fileOutputstream != null) {
                 	fileOutputstream.close();
                 }
@@ -156,8 +177,9 @@ public class Client {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+           
         }
-		//scanner.close();
+		
 	}
 	
 	
