@@ -19,7 +19,7 @@ import org.apache.commons.net.ftp.FTPReply;
 
 public class Client {
 	static FTPClient myClient;
-	
+	static Scanner console = new Scanner(System.in);
 	// Method to establish the connection with FTP server and login with user details
 	
 	
@@ -92,7 +92,7 @@ public class Client {
         
 	//Story 3
 	public static void listRemoteFiles(){
-		System.out.println("list Remote Files");
+		System.out.println("List of Remote Files:");
 		// lists files and directories in the current working directory
 		// Can't test without a connection
 		FTPFile[] files;
@@ -238,7 +238,33 @@ public class Client {
 			}
 		}
 	
-	
+		private static void rename() {
+			System.out.println ("Enter name of the file/directory to rename:");
+			String oldname = console.nextLine();
+			
+			boolean success;
+			try {
+				
+				if(!checkFileExists(oldname)){
+					System.out.printf("File %s not on remote server.\n", oldname);	
+	        		}
+				
+				System.out.println ("Enter new name:");
+				String newname = console.nextLine();
+				
+				success = myClient.rename(oldname, newname);
+		           if (success) {
+		                System.out.println(oldname + " was successfully renamed to: "
+		                        + newname);
+		            } else {
+		                System.out.println("Failed to rename: " + newname);
+		            }
+			} catch (IOException e) {
+				System.out.println("rename(): Unexpected exception");
+				e.printStackTrace();
+			}
+		}
+		
 	public static void main(String[] args) {
 	        
 		    String server = "71.237.177.239";
@@ -247,7 +273,7 @@ public class Client {
 	        boolean connectres=false;
 	        boolean loginres=false;
 	        
-	        Scanner console = new Scanner(System.in);
+	        
 	        
 	        //Call to establish the connection with FTP server
 	        myClient = new FTPClient();
@@ -299,6 +325,7 @@ public class Client {
 	        			+ "3. Logoff from server.\n"
 	        			+ "4. Get a file from remote server. (download) \n"
 	        			+ "5. Create directory on remote server. \n"
+	        			+ "10.Rename file/directory on remote server \n"
 	        			);
 //	        			+ "Q. Quit.");
 	        	String choice = console.nextLine();
@@ -323,7 +350,9 @@ public class Client {
     						String dirName = console.nextLine();
     						createDirectory(dirName);
     						break;
-    				
+	        	case"10":
+	        				rename();
+	        				break;
 	        				
 //	        	case "Q":
 //	        	case "q": 	notquit = false;
@@ -339,4 +368,6 @@ public class Client {
 	        System.exit(0);
 	         
 	}
+
+
 }
