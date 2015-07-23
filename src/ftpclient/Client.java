@@ -1,11 +1,16 @@
 package src.ftpclient;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Scanner;
 
+import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPConnectionClosedException;
 import org.apache.commons.net.ftp.FTPFile;
@@ -14,7 +19,6 @@ import org.apache.commons.net.ftp.FTPReply;
 
 public class Client {
 	static FTPClient myClient;
-	private static Scanner scanner;
 	
 	// Method to establish the connection with FTP server and login with user details
 	
@@ -133,33 +137,106 @@ public class Client {
 	
 	//Story 5
 	//get file from remote server
-	public static void fileDownload(){
-		FileOutputStream fileOutputstream = null;
+	static boolean checkFileExists(String filePath) throws IOException {
+		String[] files = myClient.listNames();
+		return Arrays.asList(files).contains(filePath);
+	}
+	
+	public static void fileDownload(String stringfiles){
+		OutputStream outputstream = null;
+		String[] files = stringfiles.split("[ ]+");
+
 		try{
-			System.out.println("Enter the filename you want to download");
-	        
-			scanner = new Scanner(System.in);
-			String remotefilename = scanner.nextLine();
-			////check if filename is blank
-			if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
-	        	System.out.println("filename cannot be blank");}
-			/////
-			fileOutputstream = new FileOutputStream(remotefilename);
-            myClient.retrieveFile("/" + remotefilename, fileOutputstream);
-		}catch(IOException e) {
+			for (String remotefilename : files) {
+				//check if filename is blank
+				if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
+			        System.out.printf("Filename %s cannot be blank.\n", remotefilename);
+			        return;
+				}
+				//check if file is present on remote directory
+				else if(!checkFileExists(remotefilename)){
+					System.out.printf("File %s not on remote server.\n", remotefilename);
+					return;
+	        		}
+				else  {
+					outputstream = new BufferedOutputStream(new FileOutputStream(remotefilename));
+					boolean success = myClient.retrieveFile(remotefilename, outputstream);
+					outputstream.close();
+					if (success)
+						System.out.printf ("Download %s completed.\n", remotefilename);
+					else
+						System.out.printf ("Download %s FAILED.\n", remotefilename);
+				}
+			}
+		} catch(IOException e) {
             e.printStackTrace();
 		}finally {
+			
             try {
-                if (fileOutputstream != null) {
-                	fileOutputstream.close();
+            	          
+                if (outputstream != null) {
+                	outputstream.close();
                 }
                 
             } catch (IOException e) {
                 e.printStackTrace();
             }
+           
         }
-		//scanner.close();
+		
 	}
+	
+	//story 9  create directories on remote server
+		public static void createDirectory(String dirName)
+		{
+			
+			Boolean replycode = null;
+			int ch = 0;
+			/* 
+			 * The following code will check if the user tries to enter nested directories
+			 * example Test\java. and if there are nested directories displays the appropriate messages
+			 * if not directory is created
+			 */
+			try
+			{
+				ch = dirName.indexOf('\\');
+								
+			}catch(StringIndexOutOfBoundsException e){
+				e.printStackTrace();
+			}
+			
+			
+			if(ch!=-1)
+			{
+				System.out.println("Nested Directories are not supported! Please try again");
+			}
+			else
+			{
+				
+				/*
+				 * The following code is to create the directory in the current directory on remote server
+				 */
+				try
+				{
+					replycode = myClient.makeDirectory(dirName);
+					System.out.print(myClient.getReplyString());
+					
+				}catch(IOException e)
+				{
+					e.printStackTrace();
+				}	
+				if (replycode)
+				{
+					listRemoteFiles();
+					System.out.println("Directory created Successfully: ");
+				
+				}
+				else
+				{
+					System.out.println("Failed to create directory");
+				}
+			}
+		}
 	
 	
 	public static void main(String[] args) {
@@ -172,7 +249,7 @@ public class Client {
 	        
 	        Scanner console = new Scanner(System.in);
 	        
-	      //Call to establish the connection with FTP server
+	        //Call to establish the connection with FTP server
 	        myClient = new FTPClient();
 	        
 	        connectres=serverConnect(server,port);
@@ -206,14 +283,24 @@ public class Client {
 		          else 
 		        	  continue;
 		     }
-		           
+		    
+	        // Need this for downloading
+	        try {
+	        	myClient.setFileType(FTP.BINARY_FILE_TYPE);
+	        	myClient.enterLocalPassiveMode();
+	        } catch (IOException e) {
+	        	e.printStackTrace();
+	        }
+	        
 	        boolean notquit = true;
 	        while(loginres && notquit){
 	        	System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
 	        			+ "2. List files and directories on local system (current directory.)\n"
 	        			+ "3. Logoff from server.\n"
-	        			+ "4. Get file from remote server.\n"
-	        			+ "Q. Quit.");
+	        			+ "4. Get a file from remote server. (download) \n"
+	        			+ "5. Create directory on remote server. \n"
+	        			);
+//	        			+ "Q. Quit.");
 	        	String choice = console.nextLine();
 	        	switch(choice){
 	        	case "1": 	listRemoteFiles();
@@ -225,17 +312,23 @@ public class Client {
 	        	case "3":  	logoff();
 	        				break;
 	        				
-	        	case "4":   System.out.println("Here is the list of remote files");
-	        				listRemoteFiles();
-	        				fileDownload();
-	        				System.out.println("Here is updated list of local files");
-	        				listLocalFiles();
-	        	           break;
-	        				
-	        	case "Q":
-	        	case "q": 	notquit = false;
-	        				logoff();
+	        	case "4":	//Getting a file from server
+	        				System.out.println ("Enter file name to download:");
+	        				String f = console.nextLine();
+	        				fileDownload(f);
 	        				break;
+	        				
+	        	case "5":   //Get the name of the directory to be created from user
+    						System.out.println ("Enter name of the directory to create:");
+    						String dirName = console.nextLine();
+    						createDirectory(dirName);
+    						break;
+    				
+	        				
+//	        	case "Q":
+//	        	case "q": 	notquit = false;
+//	        				logoff();
+//	        				break;
 	        				
 	        	default: 	System.out.println("Did not understand your selection.");
 	        	
