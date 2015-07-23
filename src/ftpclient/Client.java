@@ -1,7 +1,6 @@
 package src.ftpclient;
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -145,10 +144,15 @@ public class Client {
 	public static void fileDownload(String stringfiles){
 		OutputStream outputstream = null;
 		String[] files = stringfiles.split("[ ]+");
-
+		
+		// check for when input is all blank spaces.
+		if (files.length == 0) {
+			System.out.println ("Filename cannot be blank.\n");
+			return;
+		}
 		try{
 			for (String remotefilename : files) {
-				//check if filename is blank
+				// check if filename is blank
 				if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
 			        System.out.printf("Filename %s cannot be blank.\n", remotefilename);
 			        continue;
