@@ -151,12 +151,12 @@ public class Client {
 				//check if filename is blank
 				if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
 			        System.out.printf("Filename %s cannot be blank.\n", remotefilename);
-			        return;
+			        continue;
 				}
 				//check if file is present on remote directory
 				else if(!checkFileExists(remotefilename)){
 					System.out.printf("File %s not on remote server.\n", remotefilename);
-					return;
+					continue;
 	        		}
 				else  {
 					outputstream = new BufferedOutputStream(new FileOutputStream(remotefilename));
