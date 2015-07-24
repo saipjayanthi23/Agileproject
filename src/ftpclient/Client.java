@@ -24,6 +24,7 @@ public class Client {
 	// Method to establish the connection with FTP server and login with user details
 	
 	
+	
 	//Story 1
 	public static boolean serverConnect(String server,int port){
         
@@ -245,55 +246,122 @@ public class Client {
 		}
 	
 	//story 9  create directories on remote server
-		public static void createDirectory(String dirName)
+		public static void createDirectory()
 		{
+			//Get the name of the directory to be created from user
+			System.out.println ("Enter name of the directory to create:");
+			String dirName = console.nextLine();
 			
-			Boolean replycode = null;
+			Boolean replycode = null,flag=null;
 			int ch = 0;
+			int checks[]= new int[8];
 			/* 
 			 * The following code will check if the user tries to enter nested directories
 			 * example Test\java. and if there are nested directories displays the appropriate messages
 			 * if not directory is created
 			 */
-			try
+		    if(dirName.length()==0)
 			{
-				ch = dirName.indexOf('\\');
-								
-			}catch(StringIndexOutOfBoundsException e){
-				e.printStackTrace();
+				System.out.println("Directory name cannot be blank. Please try again");
 			}
-			
-			
-			if(ch!=-1)
-			{
-				System.out.println("Nested Directories are not supported! Please try again");
-			}
-			else
-			{
+		    else
+		    {
+		    	try
+				{
+					ch = dirName.indexOf('\\');
+					checks[0] =dirName.indexOf('/') ;
+					checks[1] = dirName.indexOf(':');
+					checks[2] =  dirName.indexOf('*');
+					checks[3] =  dirName.indexOf('?');
+					checks[4] =  dirName.indexOf('"');
+					checks[5] =  dirName.indexOf('<');
+					checks[6] =  dirName.indexOf('>');
+					checks[7] =  dirName.indexOf('|');
+					
+					for(int i=0;i<checks.length;i++)
+					{
+						if (checks[i]!=-1)
+							flag=true;
+					}
+					
+									
+				}catch(StringIndexOutOfBoundsException e){
+					e.printStackTrace();				
+				}		
+		    
+		    	if(ch!=-1)
+		    	{
+		    		System.out.println("Nested Directories are not supported! Please try again");
+		    	}
+		    	else if(flag )
+		    	{
+		    		System.out.println("Directory name cannot contain /:*?\"<>| Please try again");
+		    	}
+		    	else
+		    	{
 				
 				/*
 				 * The following code is to create the directory in the current directory on remote server
 				 */
+		    		try
+		    		{
+		    			replycode = myClient.makeDirectory(dirName);
+		    			System.out.print(myClient.getReplyString());
+					
+		    		}catch(IOException e)
+		    		{
+		    			e.printStackTrace();
+		    		}	
+		    		if (replycode)
+		    		{
+		    			listRemoteFiles();
+						System.out.println("Directory created Successfully: ");
+				
+		    		}
+		    		else
+					{
+		    			System.out.println("Failed to create directory");
+					}
+		    	}
+		    }
+		}
+		
+		//story 10 delete files from remote server
+		public static void deleteRemoteFiles()
+		{
+			//Get the name of the directory to be created from user
+			System.out.println("Enter the name of the file to delete "
+					+ "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
+					+ " if the file is in current directory just enter the filename \n");
+			String filename = console.nextLine();
+			Boolean replycode=null;
+			if(filename.length()==0)
+			{
+				System.out.println("File name cannot be blank. Please try again!");
+			}
+			else
+			{
 				try
 				{
-					replycode = myClient.makeDirectory(dirName);
-					System.out.print(myClient.getReplyString());
+					replycode = myClient.deleteFile(filename);
+					System.out.println(myClient.getReplyString());
 					
-				}catch(IOException e)
-				{
+				}catch(IOException e){
+					
 					e.printStackTrace();
-				}	
-				if (replycode)
+				}
+				
+				if(replycode)
 				{
 					listRemoteFiles();
-					System.out.println("Directory created Successfully: ");
-				
+					System.out.println("File deleted Successfully.");
 				}
 				else
 				{
-					System.out.println("Failed to create directory");
+					System.out.println("File not deleted.Please try again");
 				}
 			}
+			
 		}
 	
 		//Stories 13 & 14
@@ -409,6 +477,7 @@ public class Client {
 	        			+ "4. Get file(s) from remote server. (download) \n"
 	        			+ "5. Put file(s) on remote server. (upload) \n"
 	        			+ "6. Create directory on remote server. \n"
+	        			+ "7. Delete files on remote server. \n"
 	        			+ "10.Rename file/directory on local machine \n"
 	        			+ "11.Rename file/directory on remote server \n"
 	        			);
@@ -427,12 +496,13 @@ public class Client {
 	        	case "4":	fileDownload();
 	        				break;
 	        	case "5":	fileUpload();
-		        			break;			
-	        	case "6":   //Get the name of the directory to be created from user
-    						System.out.println ("Enter name of the directory to create:");
-    						String dirName = console.nextLine();
-    						createDirectory(dirName);
+		        			break;	
+		        			
+	        	case "6":   createDirectory();
     						break;
+    						
+	        	case "7":  deleteRemoteFiles();
+	        	           break;
     						
 	        	case"10":	rename("local");
 	        				break;
