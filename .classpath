@@ -2,8 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path=""/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/priyanka/Downloads/commons-net-3.3-bin/commons-net-3.3/commons-net-3.3.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/priyanka/Downloads/commons-net-3.3-bin/commons-net-3.3/commons-net-3.3-sources.jar"/>
-	<classpathentry exported="true" kind="lib" path="C:/Users/priyanka/Downloads/commons-net-3.3-bin/commons-net-3.3/commons-net-examples-3.3.jar"/>
+	<classpathentry kind="lib" path="/Users/SAMINA/Downloads/commons-net-3.3/commons-net-3.3-sources.jar"/>
+	<classpathentry kind="lib" path="/Users/SAMINA/Downloads/commons-net-3.3/commons-net-3.3.jar"/>
+	<classpathentry kind="lib" path="/Users/SAMINA/Downloads/commons-net-3.3/commons-net-examples-3.3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
