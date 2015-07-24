@@ -1,6 +1,8 @@
 package src.ftpclient;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -134,14 +136,18 @@ public class Client {
 	
 	
 	
-	//Story 5
-	//get file from remote server
+	//Stories 5 & 6 --get file(s) from remote server
+	
 	static boolean checkFileExists(String filePath) throws IOException {
 		String[] files = myClient.listNames();
 		return Arrays.asList(files).contains(filePath);
 	}
 	
-	public static void fileDownload(String stringfiles){
+	public static void fileDownload(){
+		
+		System.out.println ("Enter file name to download:");
+		String stringfiles = console.nextLine();
+
 		OutputStream outputstream = null;
 		String[] files = stringfiles.split("[ ]+");
 		
@@ -189,6 +195,54 @@ public class Client {
         }
 		
 	}
+
+	//Stories 7 & 8 put file(s) on remote server
+	
+	static boolean checkFileExistsLocally(String filePath) throws IOException {
+	   
+		File curDir = new File(".");
+		boolean check = new File(curDir,filePath).exists();
+		return check;
+	}
+	 
+	public static void fileUpload() {
+		
+		System.out.println ("Enter file name to upload:");
+		String stringfiles = console.nextLine();
+	
+	   InputStream inputstream = null;
+		String[] files = stringfiles.split("[ ]+");
+
+		// check for when input is all blank spaces.
+		if (files.length == 0) {
+			System.out.println ("Filename cannot be blank.\n");
+			return;
+		}
+		try{
+			for (String localfilename : files) {
+				//check if filename is blank
+		    	if(localfilename.equals("") || localfilename.trim().isEmpty()){
+			       System.out.printf("Filename %s cannot be blank.\n", localfilename);
+			       continue;
+			    // check if file exists locally    
+				}else if(!checkFileExistsLocally(localfilename)){
+					System.out.printf("File %s not on local machine.\n", localfilename);
+					continue;
+		       	}
+				else  {
+					inputstream = new FileInputStream(localfilename);
+					boolean success = myClient.storeFile(localfilename, inputstream);
+					inputstream.close();
+					if (success)
+			        	System.out.printf ("Upload %s completed.\n", localfilename);
+					else
+						System.out.printf ("Upload %s FAILED.\n", localfilename);
+					}
+				}
+			} catch(IOException e) {
+	            e.printStackTrace();
+			}			
+		}
 	
 	//story 9  create directories on remote server
 		public static void createDirectory(String dirName)
@@ -327,11 +381,12 @@ public class Client {
 	        	System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
 	        			+ "2. List files and directories on local system (current directory.)\n"
 	        			+ "3. Logoff from server.\n"
-	        			+ "4. Get a file from remote server. (download) \n"
-	        			+ "5. Create directory on remote server. \n"
+	        			+ "4. Get file(s) from remote server. (download) \n"
+	        			+ "5. Put file(s) on remote server. (upload) \n"
+	        			+ "6. Create directory on remote server. \n"
 	        			+ "10.Rename file/directory on remote server \n"
 	        			);
-//	        			+ "Q. Quit.");
+
 	        	String choice = console.nextLine();
 	        	switch(choice){
 	        	case "1": 	listRemoteFiles();
@@ -343,27 +398,19 @@ public class Client {
 	        	case "3":  	logoff();
 	        				break;
 	        				
-	        	case "4":	//Getting a file from server
-	        				System.out.println ("Enter file name to download:");
-	        				String f = console.nextLine();
-	        				fileDownload(f);
+	        	case "4":	fileDownload();
 	        				break;
-	        				
-	        	case "5":   //Get the name of the directory to be created from user
+	        	case "5":	fileUpload();
+		        			break;			
+	        	case "6":   //Get the name of the directory to be created from user
     						System.out.println ("Enter name of the directory to create:");
     						String dirName = console.nextLine();
     						createDirectory(dirName);
     						break;
-	        	case"10":
-	        				rename();
+	        	case"10":	rename();
 	        				break;
 	        				
-//	        	case "Q":
-//	        	case "q": 	notquit = false;
-//	        				logoff();
-//	        				break;
-	        				
-	        	default: 	System.out.println("Did not understand your selection.");
+            	default: 	System.out.println("Did not understand your selection.");
 	        	
 	        	}
 	        }
