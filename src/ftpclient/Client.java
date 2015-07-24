@@ -318,7 +318,7 @@ public class Client {
 					}
 				}
 				else if(mode.equals("local")){
-					if(!checkFileExists(oldname))
+					if(!checkFileExistsLocally(oldname))
 					{
 						System.out.printf("File %s does not exist in current directory.\n", oldname);	
 		        	}
@@ -409,7 +409,7 @@ public class Client {
 	        			+ "4. Get file(s) from remote server. (download) \n"
 	        			+ "5. Put file(s) on remote server. (upload) \n"
 	        			+ "6. Create directory on remote server. \n"
-	        			+ "10.Rename file/directory on local server \n"
+	        			+ "10.Rename file/directory on local machine \n"
 	        			+ "11.Rename file/directory on remote server \n"
 	        			);
 
