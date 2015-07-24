@@ -296,31 +296,56 @@ public class Client {
 			}
 		}
 	
-		private static void rename() {
+		//Stories 13 & 14
+		public static void rename(String mode) {
 			System.out.println ("Enter name of the file/directory to rename:");
 			String oldname = console.nextLine();
 			
-			boolean success;
+			boolean success = false;
+			String newname = "";
+			
 			try {
-				
-				if(!checkFileExists(oldname)){
-					System.out.printf("File %s not on remote server.\n", oldname);	
-	        		}
-				
-				System.out.println ("Enter new name:");
-				String newname = console.nextLine();
-				
-				success = myClient.rename(oldname, newname);
-		           if (success) {
-		                System.out.println(oldname + " was successfully renamed to: "
-		                        + newname);
-		            } else {
-		                System.out.println("Failed to rename: " + newname);
-		            }
+				if(mode.equals("remote")){
+					if(!checkFileExists(oldname))
+					{
+						System.out.printf("File %s not on remote server.\n", oldname);	
+		        	}
+					else
+					{
+						System.out.println ("Enter new name:");
+						newname = console.nextLine();
+						success = myClient.rename(oldname, newname);
+					}
+				}
+				else if(mode.equals("local")){
+					if(!checkFileExists(oldname))
+					{
+						System.out.printf("File %s does not exist in current directory.\n", oldname);	
+		        	}
+					else
+					{
+						System.out.println ("Enter new name:");
+						newname = console.nextLine();
+						
+						File oldfile = new File(oldname);
+						File newfile = new File(newname);
+						success = oldfile.renameTo(newfile);
+					}
+				}
 			} catch (IOException e) {
 				System.out.println("rename(): Unexpected exception");
 				e.printStackTrace();
 			}
+			
+			
+			if (success) 
+			{
+                System.out.println(oldname + " was successfully renamed to: " + newname);
+            }
+			else 
+            {
+                System.out.println("Failed to rename: " + newname);
+            }
 		}
 		
 	public static void main(String[] args) {
@@ -384,7 +409,8 @@ public class Client {
 	        			+ "4. Get file(s) from remote server. (download) \n"
 	        			+ "5. Put file(s) on remote server. (upload) \n"
 	        			+ "6. Create directory on remote server. \n"
-	        			+ "10.Rename file/directory on remote server \n"
+	        			+ "10.Rename file/directory on local server \n"
+	        			+ "11.Rename file/directory on remote server \n"
 	        			);
 
 	        	String choice = console.nextLine();
@@ -407,8 +433,12 @@ public class Client {
     						String dirName = console.nextLine();
     						createDirectory(dirName);
     						break;
-	        	case"10":	rename();
+    						
+	        	case"10":	rename("local");
 	        				break;
+	        				
+	        	case"11":	rename("remote");
+							break;
 	        				
             	default: 	System.out.println("Did not understand your selection.");
 	        	
