@@ -252,7 +252,7 @@ public class Client {
 			System.out.println ("Enter name of the directory to create:");
 			String dirName = console.nextLine();
 			
-			Boolean replycode = null,flag=null;
+			Boolean replycode = null,flag= false;
 			int ch = 0;
 			int checks[]= new int[8];
 			/* 
