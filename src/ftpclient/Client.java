@@ -391,8 +391,11 @@ public class Client {
 						System.out.printf("File/Directory %s does not exist on remote server.\n", oldname);	
 						listRemoteFiles();
 		        	}
-					else
-					{
+					
+					else{
+						//File oldfile = new File(oldname);
+						//File newfile = new File(newname);
+						//success = oldfile.renameTo(newfile);
 						System.out.println ("Enter new name:");
 						newname = console.nextLine();
 						if(newname.length()==0)
@@ -400,22 +403,23 @@ public class Client {
 							System.out.println("Remote File/Directory name cannot be blank. Please try again!!!");
 							listRemoteFiles();
 						}
-						File oldfile = new File(oldname);
-						File newfile = new File(newname);
-						success = oldfile.renameTo(newfile);
 						
+					
+							boolean success1 = myClient.rename(oldname, newname);
+								           
 						
-						if (success) 
+						if(success1) 
 						{
-			                System.out.println(oldname + " was successfully renamed to: " + newname);
+			                System.out.printf(oldname + " was successfully renamed to: " + newname);
+			                
 			                listRemoteFiles();
 			            }
 						else
-		                {
+		                	{
 		                	System.out.println("File/Directory name cannot contain special characters.Please try again :" + newname);
 		                	
 		                listRemoteFiles();
-						}
+		                	}
 						
 						}
 					
