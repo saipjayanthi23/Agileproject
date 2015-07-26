@@ -366,55 +366,107 @@ public class Client {
 	
 		//Stories 13 & 14
 		public static void rename(String mode) {
+			
 			System.out.println ("Enter name of the file/directory to rename:");
 			String oldname = console.nextLine();
-			
 			boolean success = false;
 			String newname = "";
 			
+			
+			if(oldname.length()==0)
+			{
+				System.out.println("File/Directory name cannot be blank. Please try again!!!");
+				
+			}	
+			else
+			{
+					
 			try {
-				if(mode.equals("remote")){
+				if(mode.equals("remote"))
+				{
+					
+										    				
 					if(!checkFileExists(oldname))
 					{
-						System.out.printf("File %s not on remote server.\n", oldname);	
+						System.out.printf("File/Directory %s does not exist on remote server.\n", oldname);	
+						listRemoteFiles();
 		        	}
 					else
 					{
 						System.out.println ("Enter new name:");
 						newname = console.nextLine();
-						success = myClient.rename(oldname, newname);
-					}
-				}
-				else if(mode.equals("local")){
+						if(newname.length()==0)
+						{
+							System.out.println("Remote File/Directory name cannot be blank. Please try again!!!");
+							listRemoteFiles();
+						}
+						File oldfile = new File(oldname);
+						File newfile = new File(newname);
+						success = oldfile.renameTo(newfile);
+						
+						
+						if (success) 
+						{
+			                System.out.println(oldname + " was successfully renamed to: " + newname);
+			                listRemoteFiles();
+			            }
+						else
+		                {
+		                	System.out.println("File/Directory name cannot contain special characters.Please try again :" + newname);
+		                	
+		                listRemoteFiles();
+						}
+						
+						}
+					
+					
+				    }
+				
+				else if(mode.equals("local"))
+				{
+							
 					if(!checkFileExistsLocally(oldname))
 					{
-						System.out.printf("File %s does not exist in current directory.\n", oldname);	
+						System.out.printf("File/Directory %s does not exist in local directory.\n", oldname);	
+						
+						listLocalFiles();
 		        	}
 					else
 					{
 						System.out.println ("Enter new name:");
 						newname = console.nextLine();
 						
+						if(newname.length()==0)
+						{
+							System.out.println("Local File/ Directory name cannot be blank. Please try again");
+						}
 						File oldfile = new File(oldname);
 						File newfile = new File(newname);
 						success = oldfile.renameTo(newfile);
+			if (success) 
+					{
+	                System.out.println(oldname + " was successfully renamed to: " + newname);
+	                listLocalFiles();
+					}
+	                else
+	                {
+	                	System.out.println("File/Directory name cannot contain special characters.Please try again :" + newname);
+	                	
+	                listLocalFiles();
 					}
 				}
-			} catch (IOException e) {
-				System.out.println("rename(): Unexpected exception");
-				e.printStackTrace();
-			}
-			
-			
-			if (success) 
-			{
-                System.out.println(oldname + " was successfully renamed to: " + newname);
-            }
-			else 
-            {
-                System.out.println("Failed to rename: " + newname);
-            }
+				}	
+				
+				} 
+			catch (IOException e) {		
+				
+								e.printStackTrace();
+									}
 		}
+		
+			
+		    
+		}	
 		
 	public static void main(String[] args) {
 	        
