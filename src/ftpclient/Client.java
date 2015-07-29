@@ -289,9 +289,11 @@ public class Client {
 					e.printStackTrace();				
 				}		
 		    
-		    	if(ch!=-1)
+		    	if(ch!=-1 && !flag)
 		    	{
-		    		System.out.println("Nested Directories are not supported! Please try again");
+		    		//System.out.println("Nested Directories are not supported! Please try again");
+		    		createNestedDirectory(dirName);
+		    		listRemoteFiles();
 		    	}
 		    	else if(flag )
 		    	{
@@ -324,6 +326,57 @@ public class Client {
 					}
 		    	}
 		    }
+		}
+		
+		// create nested directories		
+		
+		public static void createNestedDirectory( String path)
+		{
+			boolean exist = false,reply=false;
+		    //Get the name of the directory to be created from user
+//			System.out.println ("Enter name of the directory to create:");
+//			String path = console.nextLine();
+					
+			String[] dirPath = path.split("\\\\");
+			if (dirPath != null && dirPath.length > 0) 
+			{
+				for(String dir:dirPath)
+				{
+					try 
+					{
+						exist = myClient.changeWorkingDirectory(dir);
+						
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				
+					if(!exist && dir.length()!=0)
+					{
+						try 
+						{
+								reply = myClient.makeDirectory(dir);
+								System.out.print(myClient.getReplyString());
+								if(reply)
+								{
+									exist = myClient.changeWorkingDirectory(dir);
+								}
+								
+							
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					if(!reply)
+						break;
+				}
+				try 
+				{
+					exist = myClient.changeWorkingDirectory("/");
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
 		}
 		
 		//story 10 delete files from remote server
@@ -606,12 +659,36 @@ public class Client {
 		
 			
 		    
-		}	
+		}
+
+	// change directory option 12.. can remove if not needed. added for testing story 9!!
+		
+		public static void  changeDirectory()
+		{
+			System.out.println("enter the directory name or path(/ to go to root directory):");
+			String cdpath = console.nextLine();
+			Boolean exist=false;
+			try 
+			{
+				exist = myClient.changeWorkingDirectory(cdpath);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			if(exist)
+			{
+				System.out.println("Directory changed to "+ cdpath);
+			}
+			else
+			{
+				System.out.println("Directory cannot be changed. Please try again");
+			}
+		}
+		
 		
 	public static void main(String[] args) {
 	        
+		   // String server = "10.200.27.150";
 		    String server = "71.237.177.239";
-	        
 		    int port = 21;
 	        boolean connectres=false;
 	        boolean loginres=false;
@@ -674,6 +751,7 @@ public class Client {
 	        			+ "9. Delete multiple directories on remote server \n"
 	        			+ "10.Rename file/directory on local machine \n"
 	        			+ "11.Rename file/directory on remote server \n"
+	        			+ "12. change directory (for create nested directories) \n"
 	        			);
 
 	        	String choice = console.nextLine();
@@ -707,7 +785,10 @@ public class Client {
 	        				
 	        	case"11":	rename("remote");
 							break;
-	        				
+							
+	        	case "12": changeDirectory();
+	        	           break;
+	        	        				
             	default: 	System.out.println("Did not understand your selection.");
 	        	
 	        	}
