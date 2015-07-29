@@ -253,8 +253,8 @@ public class Client {
 			String dirName = console.nextLine();
 			
 			Boolean replycode = null,flag= false;
-			int ch = 0;
-			int checks[]= new int[8];
+			int ch1 = 0,ch2=0;
+			int checks[]= new int[7];
 			/* 
 			 * The following code will check if the user tries to enter nested directories
 			 * example Test\java. and if there are nested directories displays the appropriate messages
@@ -268,15 +268,16 @@ public class Client {
 		    {
 		    	try
 				{
-					ch = dirName.indexOf('\\');
-					checks[0] =dirName.indexOf('/') ;
-					checks[1] = dirName.indexOf(':');
-					checks[2] =  dirName.indexOf('*');
-					checks[3] =  dirName.indexOf('?');
-					checks[4] =  dirName.indexOf('"');
-					checks[5] =  dirName.indexOf('<');
-					checks[6] =  dirName.indexOf('>');
-					checks[7] =  dirName.indexOf('|');
+					ch1 = dirName.indexOf('\\');
+					ch2 = dirName.indexOf('/');
+					checks[0] =dirName.indexOf(':') ;
+					checks[1] = dirName.indexOf('*');
+					checks[2] =  dirName.indexOf('?');
+					checks[3] =  dirName.indexOf('"');
+					checks[4] =  dirName.indexOf('<');
+					checks[5] =  dirName.indexOf('>');
+					checks[6] =  dirName.indexOf('|');
+					
 					
 					for(int i=0;i<checks.length;i++)
 					{
@@ -289,11 +290,29 @@ public class Client {
 					e.printStackTrace();				
 				}		
 		    
-		    	if(ch!=-1 && !flag)
+		    	if((ch1!=-1 || ch2!=-1) && !flag)
 		    	{
-		    		//System.out.println("Nested Directories are not supported! Please try again");
-		    		createNestedDirectory(dirName);
-		    		listRemoteFiles();
+		    		if(ch1!=-1 && ch2!=-1)
+		    		{
+		    			System.out.println("Both '/' and '\\' cannot be used to indicate nested directories! Please try again!");
+		    		}
+		    		else
+		    		{
+		    		
+		    			if (ch1!=-1)
+		    			{
+		    				createNestedDirectory(dirName,"\\");
+			    			listRemoteFiles();
+			    			
+		    			}
+		    			else
+		    			{
+		    				createNestedDirectory(dirName,"/");
+			    			listRemoteFiles();
+			    			
+		    			}
+		    			
+		    		}
 		    	}
 		    	else if(flag )
 		    	{
@@ -330,14 +349,23 @@ public class Client {
 		
 		// create nested directories		
 		
-		public static void createNestedDirectory( String path)
+		public static void createNestedDirectory( String path, String c)
 		{
 			boolean exist = false,reply=false;
 		    //Get the name of the directory to be created from user
 //			System.out.println ("Enter name of the directory to create:");
 //			String path = console.nextLine();
-					
-			String[] dirPath = path.split("\\\\");
+			String[] dirPath;
+			if(c=="\\")	
+			{
+				dirPath = path.split("\\\\");
+				
+			}
+			else
+			{
+				dirPath = path.split("/");
+				
+			}
 			if (dirPath != null && dirPath.length > 0) 
 			{
 				for(String dir:dirPath)
@@ -346,19 +374,22 @@ public class Client {
 					{
 						exist = myClient.changeWorkingDirectory(dir);
 						
+						
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-				
+					
 					if(!exist && dir.length()!=0)
 					{
 						try 
 						{
+							    
 								reply = myClient.makeDirectory(dir);
-								System.out.print(myClient.getReplyString());
+								System.out.println(myClient.getReplyString());
 								if(reply)
 								{
 									exist = myClient.changeWorkingDirectory(dir);
+									
 								}
 								
 							
@@ -366,8 +397,8 @@ public class Client {
 							e.printStackTrace();
 						}
 					}
-					if(!reply)
-						break;
+					
+						
 				}
 				try 
 				{
