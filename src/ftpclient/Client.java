@@ -135,66 +135,198 @@ public class Client {
 	}
 	
 	
-	
-	
 	//Stories 5 & 6 --get file(s) from remote server
-	
 	static boolean checkFileExists(String filePath) throws IOException {
-		String[] files = myClient.listNames();
-		return Arrays.asList(files).contains(filePath);
+		int rc, j = 0;
+		boolean exist = false;
+		
+		// check for nested
+		rc = checkNested(filePath);
+		if (rc == -1)
+			return false; 	// illegal nested. So, file not exists. 
+		else if (rc == 0) { // not nested. So check in current dir
+			String[] rfiles = myClient.listNames();
+			return Arrays.asList(rfiles).contains(filePath);
+		}
+		else { // nested path! walk the filePath
+			String[] dirPath = null;
+			dirPath = filePath.split("\\\\");
+			if (dirPath.length == 1) {
+				dirPath = filePath.split("/");
+			}
+			if (dirPath != null && dirPath.length > 0) {
+				for (String dir : dirPath) {
+					try {
+						exist = myClient.changeWorkingDirectory(dir);
+						j++;
+						if (!exist) { // not a directory, is it a file?
+							String[] rfiles = myClient.listNames();
+							return Arrays.asList(rfiles).contains(dir);
+						}
+						if (j == dirPath.length) {
+							System.out.printf ("Downloading directory, %s, is not supported. ", filePath);
+							System.out.println ("Treating it as file not exist on remote server!!! ");
+							continue;
+						}	
+						else
+							continue;	
+					}
+					catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}	
+		}
+		return false; // if we get here, file doesn't exist.
 	}
 	
-	public static void fileDownload(){
+	// 0 = not nested
+	// 1 = nested 
+	// -1 = illegal nested
+	static int checkNested (String f){
+		int ch1, ch2, flag = 0;
 		
+		ch1 = f.indexOf('\\');
+		ch2 = f.indexOf('/');
+		
+		// nuts! both / and \ are used for path
+		if (ch1 != -1 && ch2 != -1) {
+			System.out.println ("Both '/' and '\\' cannot be used to indicate nested directories.");
+			flag = -1;
+		} else if (ch1 != -1 || ch2 != -1){
+			flag = 1;
+		} else {
+			flag = 0;
+		}		
+		return flag;
+	}
+	
+
+	// NOTE: this only work for downloading files. Do not pass a directory!
+	public static void fileDownload(){
 		System.out.println ("Enter file name to download:");
 		String stringfiles = console.nextLine();
+		String savedRemoteDir = null;
+		try { 
+			savedRemoteDir = myClient.printWorkingDirectory();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		String savedLocalDir = System.getProperty("user.dir");
 
-		OutputStream outputstream = null;
 		String[] files = stringfiles.split("[ ]+");
+		OutputStream outputstream;
 		
 		// check for when input is all blank spaces.
 		if (files.length == 0) {
 			System.out.println ("Filename cannot be blank.\n");
 			return;
 		}
+
 		try{
 			for (String remotefilename : files) {
+				// here's the starting point: restore default working directories
+				try {
+					myClient.changeWorkingDirectory(savedRemoteDir);
+					System.setProperty("user.dir", savedLocalDir);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 				// check if filename is blank
 				if(remotefilename.equals("") || remotefilename.trim().isEmpty()){
 			        System.out.printf("Filename %s cannot be blank.\n", remotefilename);
 			        continue;
 				}
-				//check if file is present on remote directory
+				// check if file is present on remote directory
 				else if(!checkFileExists(remotefilename)){
 					System.out.printf("File %s not on remote server.\n", remotefilename);
 					continue;
 	        		}
-				else  {
-					outputstream = new BufferedOutputStream(new FileOutputStream(remotefilename));
-					boolean success = myClient.retrieveFile(remotefilename, outputstream);
-					outputstream.close();
-					if (success)
-						System.out.printf ("Download %s completed.\n", remotefilename);
-					else
-						System.out.printf ("Download %s FAILED.\n", remotefilename);
+				else  { 
+					// each remotefilename could be a/file/in/this/form. "form" has to be a file, not directory.
+					String[] dirPath;
+					dirPath = remotefilename.split("\\\\");
+					int j = 0;
+					if (dirPath.length == 1) {
+						dirPath = remotefilename.split("/");
+					}
+					if (dirPath.length == 1) {
+						File check = new File (dirPath[0]);
+						if (check.isDirectory()) {
+							System.out.printf ("Downloading directory, %s, is not supported.", dirPath[0]);
+							continue;
+						}
+					}
+					if (dirPath.length > 0 && dirPath != null) {
+						for (String dir : dirPath) {
+							// does dir exists on local?
+							String name = null;
+							name = System.getProperty("user.dir") + "/" + dir;
+							File curFile = new File (name);
+							
+							try {
+								if (!curFile.exists()) {
+									// the last of the dirPath has to be a file, don't attempt to mkdir
+									if (j != (dirPath.length - 1)) {
+										curFile.mkdir();
+										// change present working dir on local machine
+										System.setProperty("user.dir", name);
+								
+										try {
+											myClient.changeWorkingDirectory(dir);
+										} catch (IOException e) {
+											e.printStackTrace();
+										}
+									// No support for downloading directory!	
+									} else if (curFile.isDirectory()) {
+										System.out.printf ("Downloading directory, %s, is not supported.", curFile);
+										continue;
+									}else { 
+										// here the local and remote server have the same directory structure
+										// ready to download file (a/file/in/this/form, where form is a file)
+										remotefilename = dir; // don't be confused. dir here is a file that we want
+										outputstream = new BufferedOutputStream(new FileOutputStream(remotefilename));
+										boolean success = myClient.retrieveFile(remotefilename, outputstream);
+										outputstream.close();
+										if (success) {
+											// FIXME: for some reasons the downloaded file is put in the savedLocalDir
+											// it's not in the expected working directory. So, we need this hack
+											// move the file to where we expect it
+											File old = new File (savedLocalDir + "/" + dir);
+											if (old.renameTo(new File (System.getProperty("user.dir") + "/" + dir))) {
+												System.out.printf ("Download %s completed.\n", remotefilename);
+											} else {
+												System.out.printf ("Download %s completed, but failed to move file to its proper location.\n", remotefilename);
+											}		
+										}
+										else {
+											System.out.printf ("Download %s FAILED.\n", remotefilename);
+										}
+									}		
+								} else if (curFile.isFile()) { 
+									System.out.printf ("%s exists on local. Remove it first.", name);									j++;
+									continue;
+								} else {
+									System.setProperty("user.dir", name);
+								}
+							} catch (SecurityException e){
+								e.printStackTrace();
+							}
+							j++;
+						}
+					}
 				}
+			}
+			// restore working directories
+			try {
+				myClient.changeWorkingDirectory(savedRemoteDir);
+				System.setProperty("user.dir", savedLocalDir);
+			} catch (IOException e) {
+				e.printStackTrace();
 			}
 		} catch(IOException e) {
             e.printStackTrace();
-		}finally {
-			
-            try {
-            	          
-                if (outputstream != null) {
-                	outputstream.close();
-                }
-                
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-           
-        }
-		
+		}
 	}
 
 	//Stories 7 & 8 put file(s) on remote server
