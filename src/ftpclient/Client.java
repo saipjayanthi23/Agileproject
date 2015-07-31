@@ -716,113 +716,105 @@ public class Client {
 		
 		
 	
-		//Stories 13 & 14
-		public static void rename(String mode) {
+		//Story 13 --rename remote file and directories
+		//example:give path as--- parent/child/child0(if we have to rename child0 to child7)
+		//rename to ---- parent/child/child7		
+		//if filename give extension(example: file1.txt)		
+		public static void renameRemoteFileandDirectories( )
+		{
 			
-			System.out.println ("Enter name of the file/directory to rename:");
-			String oldname = console.nextLine();
-			boolean success = false;
-			String newname = "";
+			listRemoteFiles();
+										
+			try {
+	            
+	           
+				System.out.println ("Enter name of the file/directory to rename:");
+				String oldname = console.nextLine();
+				//if no directory/filename name is given ie, simply enter key is pressed
+				if(oldname.length()==0)
+								{
+									System.out.println("File/Directory name cannot be blank. Please try again!!!");
+									
+								}	
+				
+				else
+				{
+					boolean success = false;
+					System.out.println ("Enter new directory name:\n");
+					String newname = console.nextLine();
+					//if no directory/filename name is given ie, simply enter key is pressed
+				if(newname.length()==0)
+					{
+					System.out.println("File/Directory name cannot be blank. Please try again!!!");
+					
+					}
+	            
+	            //boolean success1 = false;
+	            	success = myClient.rename(oldname, newname);
+	            	if (success)
+	            		{
+	                System.out.println(oldname + " was successfully renamed to: " + newname);
+	            		}
+	            	else
+	            		{
+	            		System.out.println("Failed to rename: remote " + oldname);
+	            		}
+				}
+	 
+	         }catch (IOException ex){ex.printStackTrace();}
 			
+		}
+				
 			
-			if(oldname.length()==0)
-			{
+		//story 14 Rename local files and directories
+		//example:give path as :--- localdirectory/file.txt
+		//rename to:--localdirectory/file4.txt
+		public static void renameLocalFileandDirectories( ) 
+		
+		{
+			
+			listLocalFiles();
+			
+			try {
+	            System.out.println ("Enter name of the file/directory to rename:");
+				String oldname = console.nextLine();
+				//if no directory/filename name is given ie, simply enter key is pressed.
+				if(oldname.length()==0)
+				{
+					System.out.println("File/Directory name cannot be blank. Please try again!!!");
+					
+				}	
+				else
+				{
+				boolean success = false;
+				System.out.println ("Enter new local file/directory name:\n");
+				String newname = console.nextLine();
+	            
+				//if no directory/filename name is given ie, simply enter key is pressed.
+				if(newname.length()==0)
+				{
 				System.out.println("File/Directory name cannot be blank. Please try again!!!");
 				
-			}	
-			else
-			{
-					
-			try {
-				if(mode.equals("remote"))
-				{
-					
-										    				
-					if(!checkFileExists(oldname))
-					{
-						System.out.printf("File/Directory %s does not exist on remote server.\n", oldname);	
-						listRemoteFiles();
-		        	}
-					
-					else{
-						//File oldfile = new File(oldname);
-						//File newfile = new File(newname);
-						//success = oldfile.renameTo(newfile);
-						System.out.println ("Enter new name:");
-						newname = console.nextLine();
-						if(newname.length()==0)
-						{
-							System.out.println("Remote File/Directory name cannot be blank. Please try again!!!");
-							listRemoteFiles();
-						}
-						
-					
-							boolean success1 = myClient.rename(oldname, newname);
-								           
-						
-						if(success1) 
-						{
-			                System.out.printf(oldname + " was successfully renamed to: " + newname);
-			                
-			                listRemoteFiles();
-			            }
-						else
-		                	{
-		                	System.out.println("File/Directory name cannot contain special characters.Please try again :" + newname);
-		                	
-		                listRemoteFiles();
-		                	}
-						
-						}
-					
-					
-				    }
-				
-				else if(mode.equals("local"))
-				{
-							
-					if(!checkFileExistsLocally(oldname))
-					{
-						System.out.printf("File/Directory %s does not exist in local directory.\n", oldname);	
-						
-						listLocalFiles();
-		        	}
-					else
-					{
-						System.out.println ("Enter new name:");
-						newname = console.nextLine();
-						
-						if(newname.length()==0)
-						{
-							System.out.println("Local File/ Directory name cannot be blank. Please try again");
-						}
-						File oldfile = new File(oldname);
-						File newfile = new File(newname);
-						success = oldfile.renameTo(newfile);
-			if (success) 
-					{
-	                System.out.println(oldname + " was successfully renamed to: " + newname);
-	                listLocalFiles();
-					}
-	                else
-	                {
-	                	System.out.println("File/Directory name cannot contain special characters.Please try again :" + newname);
-	                	
-	                listLocalFiles();
-					}
 				}
-				}	
 				
-				} 
-			catch (IOException e) {		
-				
-								e.printStackTrace();
-									}
-		}
-		
+				File oldfile = new File(oldname);
+				File newfile = new File(newname);
+				success = oldfile.renameTo(newfile);
+	            
+	            if (success) {
+	                System.out.println(oldname + " was successfully renamed to: "
+	                        + newname);
+	            			} 
+	            else {
+	                System.out.println("Failed to rename local " + oldname);
+	            	}
+				}
+	          } catch(Exception e) {
+	            e.printStackTrace();
+	            }
 			
-		    
-		}
+			}
+		
 
 	// change directory option 12.. can remove if not needed. added for testing story 9!!
 		
@@ -840,6 +832,7 @@ public class Client {
 			if(exist)
 			{
 				System.out.println("Directory changed to "+ cdpath);
+				listRemoteFiles();
 			}
 			else
 			{
@@ -943,10 +936,10 @@ public class Client {
 	        	case "9": removeRemoteDirectories();
 							break;
     						
-	        	case"10":	rename("local");
+	        	case "10":renameLocalFileandDirectories();
 	        				break;
 	        				
-	        	case"11":	rename("remote");
+	        	case "11": renameRemoteFileandDirectories();
 							break;
 							
 	        	case "12": changeDirectory();
