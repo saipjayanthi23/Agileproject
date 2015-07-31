@@ -550,81 +550,93 @@ public class Client {
     // removeRemoteDirectory() but to delete multiple directories [Test] and
     // [Folder] we need
     // to call removeRemoteDirectories()
+    public static void DelDir()
+	{
+		listRemoteFiles();
+		System.out.println("Enter the name of the directory to delete \n");
+           String filename = console.nextLine();
+        
+           Boolean savedremotedirectory=null;
+           try{
+        	   savedremotedirectory=myClient.changeWorkingDirectory(filename);
+         	  //System.out.println(savedremotedirectory);
+           
+           if(filename.length()==0)
+			{
+				System.out.println("Path name cannot be blank. Please try again!");
+			}
+           if(!savedremotedirectory)
+           {
+        	   System.out.println("invalid path/directory");
+           }
+			else{
+         
+        	  System.out.printf("Deleting directory %s\n",filename);
+        	  
+        	 myClient.changeWorkingDirectory("/");
+        	 
+			
+			DeleteDirectory(myClient,filename);
+			}
+           }catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+			
+	}
+	public static void DeleteDirectory(FTPClient miniClient, String remotepath) throws IOException 
+	{
+		   
+			miniClient.changeWorkingDirectory(remotepath);
+			
+		
+		
+		FTPFile[] fileList=miniClient.listFiles();
+		
+			for(FTPFile file : fileList){
+				
+				if(file.isFile())
+				{
+					System.out.printf("The file %s is being deleted \n" , file.getName());
+					miniClient.deleteFile(file.getName());
+					
+				
+				}
+			}
+				
+					
+			for(FTPFile file : fileList)	{
+				if(file.isDirectory()){
+				
+				DeleteDirectory(miniClient,file.getName());
+				}
+			}
+			
+		
+			// out of the loops
+		
+		miniClient.changeWorkingDirectory("..");
+	    boolean success=miniClient.removeDirectory(remotepath);
+	    if(success){
+	    	System.out.printf("Successfully deleted the empty directory %s \n",remotepath);
+	    	System.out.print(miniClient.getReplyString());
+	    	//listRemoteFiles();
+	    	
+	    }
+	    else
+	    {
+	    	System.out.printf("failed to delete the directory %s\n",remotepath);
+	    	System.out.print(miniClient.getReplyString());
+	    }
+		
+		
+		}
+	
 
-    public static void removeRemoteDirectory() {
-        // Get the name of the directory to be deleted from user
-        System.out.println("Enter the name of the directory to delete \n");
-        String filename = console.nextLine();
-        Boolean replycode = null;
-        if (filename.length() == 0) {
-            System.out.println("Directory name cannot be blank. Please try again!");
-        } else {
-            try {
-                replycode = myClient.removeDirectory(filename);
-                System.out.println(myClient.getReplyString());
-
-            } catch (IOException e) {
-
-                e.printStackTrace();
-                System.out.println("removeRemoteDirectory(): Unexpected exception");
-            }
-
-            if (replycode) {
-                listRemoteFiles();
-                System.out.printf("Directory %s deleted Successfully.", filename);
-            } else {
-                System.out.printf("Directory %s not deleted.Please try again", filename);
-            }
-        }
-
-    }
+    
     // story12 for multiple directories
 
-    public static void removeRemoteDirectories() {
-
-        System.out.println("Enter directory names to remove:");
-        String stringDirectory = console.nextLine();
-
-        String[] directories = stringDirectory.split("[ ]+");
-        // check for when input is all blank spaces.
-        if (directories.length == 0) {
-            System.out.println("Directory name cannot be blank.\n");
-            return;
-        }
-
-        try {
-            for (String remotedirectoryname : directories) {
-                // check for when input is all blank spaces.
-                if (remotedirectoryname.equals("") || remotedirectoryname.trim().isEmpty()) {
-                    System.out.println("Directory name cannot be blank.\n");
-                    continue;
-
-                } else if (!checkDirectoryExists(remotedirectoryname)) {
-                    System.out.printf("Directory %s not on remote server.\n", remotedirectoryname);
-                    continue;
-                }
-
-                Boolean deleted = null;
-
-                deleted = myClient.removeDirectory(remotedirectoryname);
-
-                if (deleted) {
-                    System.out.printf("The directory %s was removed successfully.\n", remotedirectoryname);
-                    System.out.println(myClient.getReplyString());
-                } else {
-                    System.out.printf("The directory %s cannot be deleted.\n", remotedirectoryname);
-                    System.out.println(myClient.getReplyString());
-
-                }
-            }
-        } catch (IOException e) {
-
-            System.out.println("removeRemoteDirectories(): Unexpected exception");
-            e.printStackTrace();
-        }
-
-    }
-
+    
     public static boolean checkDirectoryExists(String filePath) throws IOException {
         // boolean directoryExists = myClient.changeWorkingDirectory(filePath);
         boolean directoryExists = false;
@@ -809,8 +821,8 @@ public class Client {
                     + "2. List files and directories on local system (current directory.)\n"
                     + "3. Logoff from server.\n" + "4. Get file(s) from remote server. (download) \n"
                     + "5. Put file(s) on remote server. (upload) \n" + "6. Create directory on remote server. \n"
-                    + "7. Delete files on remote server. \n" + "8. Delete single directory on remote server \n"
-                    + "9. Delete multiple directories on remote server \n"
+                    + "7. Delete files on remote server. \n" + "8. Delete nested directory(s) on remote server \n"
+                    
                     + "10.Rename file/directory on local machine \n" + "11.Rename file/directory on remote server \n"
                     + "12. change directory (for create nested directories) \n");
 
@@ -843,11 +855,9 @@ public class Client {
                 deleteRemoteFiles();
                 break;
             case "8":
-                removeRemoteDirectory();
+                DelDir();
                 break;
-            case "9":
-                removeRemoteDirectories();
-                break;
+            
 
             case "10":
                 renameLocalFileandDirectories();
