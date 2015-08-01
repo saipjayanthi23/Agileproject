@@ -154,7 +154,6 @@ public class Client {
         }
     }
 
-    // Story 4
     public static void listLocalFiles() {
         File curDir = new File(".");
         File[] files = curDir.listFiles();
@@ -165,6 +164,29 @@ public class Client {
                 details = "[" + details + "]";
             }
             System.out.println(details);
+        }
+    }
+    
+    // Story 4
+    public static void listLocalFiles(String directory, int level) {
+        File curDir = new File(directory);
+        File[] files = curDir.listFiles();
+
+        for (File file : files) {
+            String details = file.getName();
+            
+            if (file.isDirectory()) {
+                details = "[" + details + "]";
+            }
+            String indentation = "";
+            for(int i = 0;i<level; i++){
+            	indentation = indentation + "    ";
+            }
+            details = indentation + details;
+            System.out.println(details);
+            if(file.isDirectory()){
+            	listLocalFiles(directory+"/"+file.getName(),level +1);
+            }
         }
     }
 
@@ -878,7 +900,9 @@ public class Client {
                 break;
 
             case "2":
-                listLocalFiles();
+            	//Uncomment this line if a recursive view of local files is required.
+                //listLocalFiles(".",0);
+            	listLocalFiles();
                 break;
 
             case "3":
