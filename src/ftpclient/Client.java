@@ -89,14 +89,14 @@ public class Client {
         }
     }
 
-    // Story 3
+    // This is to list remote files in the current working directory and is used
+    // as a submodule in all the other methods of this class
     public static void listRemoteFiles() {
-        System.out.println("List of Remote Files:");
-        // lists files and directories in the current working directory
-        // Can't test without a connection
+        
+       
         FTPFile[] files;
         try {
-
+        	System.out.println("List of Remote Files in "+ myClient.printWorkingDirectory()+":");
             files = myClient.listFiles();
             // iterates over the files and prints details for each
             DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -109,6 +109,43 @@ public class Client {
                 details += "\t\t" + file.getSize();
                 details += "\t\t" + dateFormater.format(file.getTimestamp().getTime());
                 System.out.println(details);
+            }
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            System.out.println("listRemoteFiles(): Unexpected exception");
+            e.printStackTrace();
+        }
+    }
+    
+    // Story 3 - This is to list all the remote files within the hierarchy of the current directory in a recursive fashion.
+    //This method is accessed only by inputing  option 1.
+    public static void listRemoteFiles(String directory, int level) {
+    	
+        FTPFile[] files;
+        String currentdir = directory;
+        try {
+        	
+            files = myClient.listFiles(currentdir);
+
+            // iterates over the files and prints details for each
+            DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+            for (FTPFile file : files) {
+                String details = file.getName();
+                if (file.isDirectory()) {
+                    details = "[" + details + "]";
+                }
+            	String indentation = "";
+            	for(int i = 0; i< level; i++){
+            		indentation = indentation + "    ";
+            	}
+            	details = indentation + details;
+                details += "\t\t" + file.getSize();
+                details += "\t\t" + dateFormater.format(file.getTimestamp().getTime());
+                System.out.println(details);
+                if (file.isDirectory()) {
+                    listRemoteFiles(currentdir+"/"+file.getName(), level + 1);
+                }
+                if(level == 0) System.out.println();
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
@@ -829,7 +866,15 @@ public class Client {
             String choice = console.nextLine();
             switch (choice) {
             case "1":
-                listRemoteFiles();
+            	try{
+            		System.out.println("List of Remote Files in "+ myClient.printWorkingDirectory()+":");
+            		listRemoteFiles(".",0);
+            	}
+            	catch(IOException e){
+            		System.out.println("Unexpected exception: case 1: myClient.printWorkingDirectory()");
+            	}
+                
+            	
                 break;
 
             case "2":
