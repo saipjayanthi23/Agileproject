@@ -469,7 +469,7 @@ public class Client {
                 	System.out.println(localFilePath + "  is not a valid path / filename");
                     continue;
                 } else {
-                	int rv;
+                	int rv,k=0;
                 	rv = checkNested(localFilePath);
                 	// not nested. Upload the file in remote home directory
                     if (rv == 0) { 
@@ -489,12 +489,12 @@ public class Client {
                         if (dirPath.length == 1) {
                             dirPath = localFilePath.split("/");
                         }
+                        System.out.println("length is  "+ dirPath.length);
                         if (dirPath != null && dirPath.length > 0) {
                             for (String dir : dirPath) {
                                 try {
-                                	File test = new File(dir);
-                                	// check if it is a directory name
-                                	if (test.isDirectory()){
+                                	// check if it is a directory or file name
+                                	if (k!=(dirPath.length - 1)){
                                        boolean exist = myClient.changeWorkingDirectory(dir);
                                        // if there is no such directory exists, create directory
                                        if (!exist && dir.length() != 0) {
@@ -517,7 +517,8 @@ public class Client {
                                                 e.printStackTrace();
                                            }
                                        }    
-                                    }
+                                      k++;
+                                     }
                                 	// if it a file name 
                                 	else { 
                                 		inputstream = new FileInputStream(localFilePath);
@@ -526,7 +527,6 @@ public class Client {
                                         inputstream.close();
                                         if (success){
                                             System.out.printf("Upload %s completed.\n", dir);
-                                            listRemoteFiles();
                                         }else
                                             System.out.printf("Upload %s FAILED.\n", dir);
                                   	}
