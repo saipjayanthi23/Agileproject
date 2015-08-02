@@ -165,41 +165,34 @@ public class Client {
     	}
     }
     
+ // Story 4
     public static void listLocalFiles() {
-        File curDir = new File(".");
-        File[] files = curDir.listFiles();
-
-        for (File file : files) {
-            String details = file.getName();
-            if (file.isDirectory()) {
-                details = "[" + details + "]";
-            }
-            System.out.println(details);
-        }
+    	System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
+    	String path = console.nextLine();
+    	File curDir;
+		if(path.length()!=0){
+			curDir = new File(path);
+		}
+		else{
+			curDir = new File(".");
+		}
+		if(curDir.exists() && curDir.isDirectory()){
+	        File[] files = curDir.listFiles();
+	
+	        for (File file : files) {
+	            String details = file.getName();
+	            if (file.isDirectory()) {
+	                details = "[" + details + "]";
+	            }
+	            System.out.println(details);
+	        }
+		}
+		else{
+			System.out.println("Could not list for the entered path. Please recheck and try again.");
+		}
     }
     
-    // Story 4
-    public static void listLocalFiles(String directory, int level) {
-        File curDir = new File(directory);
-        File[] files = curDir.listFiles();
-
-        for (File file : files) {
-            String details = file.getName();
-            
-            if (file.isDirectory()) {
-                details = "[" + details + "]";
-            }
-            String indentation = "";
-            for(int i = 0;i<level; i++){
-            	indentation = indentation + "    ";
-            }
-            details = indentation + details;
-            System.out.println(details);
-            if(file.isDirectory()){
-            	listLocalFiles(directory+"/"+file.getName(),level +1);
-            }
-        }
-    }
+    
 
     // Stories 5 & 6 --get file(s) from remote server
     static boolean checkFileExists(String filePath) throws IOException {
@@ -925,8 +918,6 @@ public class Client {
                 break;
 
             case "2":
-            	//Uncomment this line if a recursive view of local files is required.
-                //listLocalFiles(".",0);
             	listLocalFiles();
                 break;
 
