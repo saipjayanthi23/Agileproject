@@ -419,18 +419,36 @@ public class Client {
 
     // Stories 7 & 8 put file(s) on remote server
 
-    static boolean checkFileExistsLocally(String filePath) throws IOException {
+    static boolean checkFileExistsLocally(String filePath) throws FileNotFoundException,IOException {
 
-        File curDir = new File(".");
-        boolean check = new File(curDir, filePath).exists();
-        return check;
+    	int rv;
+        // check if filePath entered is nested
+        rv = checkNested(filePath);
+        // illegal nested. So,file not exists.
+        if (rv == -1)
+            return false;
+       // if not illegal nested,check to see if given path exists
+        else  { 
+        	   if (new File(filePath).isFile()) {
+                  return true;
+            }
+              else
+            	  return false; 
+      }
     }
 
-    public static void fileUpload() {
+   public static void fileUpload() {
 
+	    int j=0;
         System.out.println("Enter file name to upload:");
         String stringfiles = console.nextLine();
 
+        String savedRemoteDir = null;
+        try {
+            savedRemoteDir = myClient.printWorkingDirectory();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         InputStream inputstream = null;
         String[] files = stringfiles.split("[ ]+");
 
@@ -440,29 +458,95 @@ public class Client {
             return;
         }
         try {
-            for (String localfilename : files) {
+            for (String localFilePath : files) {
                 // check if filename is blank
-                if (localfilename.equals("") || localfilename.trim().isEmpty()) {
-                    System.out.printf("Filename %s cannot be blank.\n", localfilename);
+                if (localFilePath.equals("") || localFilePath.trim().isEmpty()) {
+                    System.out.printf("Filename %s cannot be blank.\n", localFilePath);
                     continue;
                     // check if file exists locally
-                } else if (!checkFileExistsLocally(localfilename)) {
-                    System.out.printf("File %s not on local machine.\n", localfilename);
+                } else if (!checkFileExistsLocally(localFilePath)) {
+                	System.out.println(localFilePath + "  is not a valid path / filename");
                     continue;
                 } else {
-                    inputstream = new FileInputStream(localfilename);
-                    boolean success = myClient.storeFile(localfilename, inputstream);
-                    inputstream.close();
-                    if (success)
-                        System.out.printf("Upload %s completed.\n", localfilename);
-                    else
-                        System.out.printf("Upload %s FAILED.\n", localfilename);
+                	int rv;
+                	rv = checkNested(localFilePath);
+                	// not nested. Upload the file in remote home directory
+                    if (rv == 0) { 
+                    	inputstream = new FileInputStream(localFilePath);
+                        boolean success = myClient.storeFile(localFilePath, inputstream);
+                        inputstream.close();
+                        if (success)
+                            System.out.printf("Upload %s completed.\n", localFilePath);
+                        else
+                            System.out.printf("Upload %s FAILED.\n", localFilePath);
+                    	listRemoteFiles();
+                    } 
+                   // nested path! walk the Path on remote server by changing the working directory recursively
+                    else { 
+                        String[] dirPath = null;
+                        dirPath = localFilePath.split("\\\\");
+                        if (dirPath.length == 1) {
+                            dirPath = localFilePath.split("/");
+                        }
+                        if (dirPath != null && dirPath.length > 0) {
+                            for (String dir : dirPath) {
+                                try {
+                                	File test = new File(dir);
+                                	// check if it is a directory name
+                                	if (test.isDirectory()){
+                                       boolean exist = myClient.changeWorkingDirectory(dir);
+                                       // if there is no such directory exists, create directory
+                                       if (!exist && dir.length() != 0) {
+                                          try {
+                                               boolean reply = myClient.makeDirectory(dir);
+                                               if(reply){
+                                                         exist = myClient.changeWorkingDirectory(dir + "/");
+                                               }
+                                          } catch (IOException e) {
+                                               e.printStackTrace();
+                                          }
+                                       }
+                                       // if directory exists, then change the working directory
+                                       else {
+                                           try {
+                                    	        exist = myClient.changeWorkingDirectory(dir +"/");
+                                    	        listRemoteFiles();
+                                           } catch (IOException e) {
+                                              // TODO Auto-generated catch block
+                                                e.printStackTrace();
+                                           }
+                                       }    
+                                    }
+                                	// if it a file name 
+                                	else { 
+                                		inputstream = new FileInputStream(localFilePath);
+                                		String remoteFileName = dir;
+                                        boolean success = myClient.storeFile(remoteFileName, inputstream);
+                                        inputstream.close();
+                                        if (success){
+                                            System.out.printf("Upload %s completed.\n", dir);
+                                            listRemoteFiles();
+                                        }else
+                                            System.out.printf("Upload %s FAILED.\n", dir);
+                                  	}
+                                } catch (IOException e) {
+                                       e.printStackTrace();
+                                }
+                             }
+                        }
+                    }
                 }
-            }
-        } catch (IOException e) {
+             // restore working directory on remote server
+                try {
+                    myClient.changeWorkingDirectory(savedRemoteDir);
+                    } catch (IOException e) {
+                    e.printStackTrace();
+                }
+             }
+        }catch (IOException e) {
             e.printStackTrace();
-        }
-    }
+     }
+   }    
 
     // story 9 create directories on remote server
     public static void createDirectory() {
