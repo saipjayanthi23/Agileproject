@@ -21,6 +21,7 @@ import org.apache.commons.net.ftp.FTPReply;
 public class Client {
     static FTPClient myClient;
     static Scanner console = new Scanner(System.in);
+    static int USERINPUT = 1;
     // Method to establish the connection with FTP server and login with user
     // details
 
@@ -119,41 +120,51 @@ public class Client {
     
     // Story 3 - This is to list all the remote files within the hierarchy of the current directory in a recursive fashion.
     //This method is accessed only by inputing  option 1.
-    public static void listRemoteFiles(String directory, int level) {
-    	
+    public static void listRemoteFiles(String directory) {
+        
+        
         FTPFile[] files;
-        String currentdir = directory;
         try {
-        	
-            files = myClient.listFiles(currentdir);
-
+        	System.out.println("List of Remote Files in "+ directory +":");
+            files = myClient.listFiles("/"+directory);
             // iterates over the files and prints details for each
             DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
             for (FTPFile file : files) {
                 String details = file.getName();
                 if (file.isDirectory()) {
                     details = "[" + details + "]";
                 }
-            	String indentation = "";
-            	for(int i = 0; i< level; i++){
-            		indentation = indentation + "    ";
-            	}
-            	details = indentation + details;
                 details += "\t\t" + file.getSize();
                 details += "\t\t" + dateFormater.format(file.getTimestamp().getTime());
                 System.out.println(details);
-                if (file.isDirectory()) {
-                    listRemoteFiles(currentdir+"/"+file.getName(), level + 1);
-                }
-                if(level == 0) System.out.println();
             }
         } catch (IOException e) {
             // TODO Auto-generated catch block
             System.out.println("listRemoteFiles(): Unexpected exception");
             e.printStackTrace();
         }
+    
     }
 
+    public static void listRemoteFiles(int mode){
+    	if(mode == USERINPUT){
+    		System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
+    		String path = console.nextLine();
+    		if(path.length()!=0){	
+				if(checkDirectoryExistsOnPath(path)){
+					listRemoteFiles(path);
+				}
+				else{
+					System.out.println("The entered path does not exist on remote.");
+				}
+    		}
+    		else{
+    			listRemoteFiles();
+    		}	
+    	}
+    }
+    
     public static void listLocalFiles() {
         File curDir = new File(".");
         File[] files = curDir.listFiles();
@@ -824,6 +835,18 @@ public class Client {
         }
     }
 
+    public static boolean checkDirectoryExistsOnPath(String cdpath){
+
+        Boolean exist = false;
+        try {
+            exist = myClient.changeWorkingDirectory(cdpath);
+            myClient.changeWorkingDirectory("/");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return exist;
+    }
+    
     public static void main(String[] args) {
 
         // String server = "10.200.27.150";
@@ -888,13 +911,15 @@ public class Client {
             String choice = console.nextLine();
             switch (choice) {
             case "1":
+            	listRemoteFiles(USERINPUT);
+            	/*
             	try{
             		System.out.println("List of Remote Files in "+ myClient.printWorkingDirectory()+":");
             		listRemoteFiles(".",0);
             	}
             	catch(IOException e){
             		System.out.println("Unexpected exception: case 1: myClient.printWorkingDirectory()");
-            	}
+            	}*/
                 
             	
                 break;
