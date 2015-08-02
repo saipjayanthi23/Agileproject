@@ -166,16 +166,36 @@ public class Client {
     }
     
  // Story 4
+    public static void listLocalFiles(int mode) {
+    	if(mode == USERINPUT){
+	    	System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
+	    	String path = console.nextLine();
+	    	File curDir;
+			if(path.length()!=0){
+				curDir = new File(path);
+			}
+			else{
+				curDir = new File(".");
+			}
+			if(curDir.exists() && curDir.isDirectory()){
+		        File[] files = curDir.listFiles();
+		
+		        for (File file : files) {
+		            String details = file.getName();
+		            if (file.isDirectory()) {
+		                details = "[" + details + "]";
+		            }
+		            System.out.println(details);
+		        }
+			}
+			else{
+				System.out.println("Could not list for the entered path. Please recheck and try again.");
+			}
+    	}
+    }
+    
     public static void listLocalFiles() {
-    	System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
-    	String path = console.nextLine();
-    	File curDir;
-		if(path.length()!=0){
-			curDir = new File(path);
-		}
-		else{
-			curDir = new File(".");
-		}
+    	File curDir = new File(".");
 		if(curDir.exists() && curDir.isDirectory()){
 	        File[] files = curDir.listFiles();
 	
@@ -191,8 +211,6 @@ public class Client {
 			System.out.println("Could not list for the entered path. Please recheck and try again.");
 		}
     }
-    
-    
 
     // Stories 5 & 6 --get file(s) from remote server
     static boolean checkFileExists(String filePath) throws IOException {
@@ -893,7 +911,7 @@ public class Client {
         boolean notquit = true;
         while (loginres && notquit) {
             System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
-                    + "2. List files and directories on local system (current directory.)\n"
+                    + "2. List files and directories on local system\n"
                     + "3. Logoff from server.\n" + "4. Get file(s) from remote server. (download) \n"
                     + "5. Put file(s) on remote server. (upload) \n" + "6. Create directory on remote server. \n"
                     + "7. Delete files on remote server. \n" + "8. Delete nested directory(s) on remote server \n"
@@ -905,20 +923,10 @@ public class Client {
             switch (choice) {
             case "1":
             	listRemoteFiles(USERINPUT);
-            	/*
-            	try{
-            		System.out.println("List of Remote Files in "+ myClient.printWorkingDirectory()+":");
-            		listRemoteFiles(".",0);
-            	}
-            	catch(IOException e){
-            		System.out.println("Unexpected exception: case 1: myClient.printWorkingDirectory()");
-            	}*/
-                
-            	
                 break;
 
             case "2":
-            	listLocalFiles();
+            	listLocalFiles(USERINPUT);
                 break;
 
             case "3":
