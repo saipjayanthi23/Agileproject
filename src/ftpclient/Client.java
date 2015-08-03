@@ -753,50 +753,65 @@ public class Client {
 	public static void DeleteDirectory(FTPClient miniClient, String remotepath) throws IOException 
 	{
 		   
-			miniClient.changeWorkingDirectory(remotepath);
-			
-		
-		
-		FTPFile[] fileList=miniClient.listFiles();
-		
-			for(FTPFile file : fileList){
-				
-				if(file.isFile())
-				{
+		//	miniClient.changeWorkingDirectory(remotepath);
+		 boolean savedremotedirectory=false ;
+		 try
+		 {
+			 savedremotedirectory = miniClient.changeWorkingDirectory(remotepath);
+			 System.out.println(miniClient.getReplyString());
+			 
+	         	  //System.out.println(savedremotedirectory);
+		 }catch (IOException e) {
+					// TODO Auto-generated catch block
+				e.printStackTrace();
+		 }				
+	          
+	     if(!savedremotedirectory)
+	     {
+	        	   System.out.println("invalid path/directory");
+	     }
+	     else
+	     {
+	    	  FTPFile[] fileList=miniClient.listFiles();		
+	    	  for(FTPFile file : fileList)
+	    	  {
+	    		  System.out.printf("The file %s\n" , file.getName());
+	    		  
+	    		  if(file.isFile())
+	    		  {
 					System.out.printf("The file %s is being deleted \n" , file.getName());
 					miniClient.deleteFile(file.getName());
-					
+	    		  }
 				
-				}
-			}
-				
-					
-			for(FTPFile file : fileList)	{
-				if(file.isDirectory()){
-				
-				DeleteDirectory(miniClient,file.getName());
-				}
-			}
+			  }
+		  
+	    	  for(FTPFile file : fileList)	
+	    	  {
+	    		  if(file.isDirectory())
+	    		  {
+	    			  DeleteDirectory(miniClient,file.getName());
+	    		  }
+	    	  }
 			
 		
 			// out of the loops
-		
-		miniClient.changeWorkingDirectory("..");
-	    boolean success=miniClient.removeDirectory(remotepath);
-	    if(success){
-	    	System.out.printf("Successfully deleted the empty directory %s \n",remotepath);
-	    	System.out.print(miniClient.getReplyString());
-	    	//listRemoteFiles();
+	     
+	    	  miniClient.changeWorkingDirectory("..");
+	    	  boolean success=miniClient.removeDirectory(remotepath);
+	    	  if(success)
+	    	  {
+	    		  System.out.printf("Successfully deleted the empty directory %s \n",remotepath);
+	    		  System.out.print(miniClient.getReplyString());
+	    		  //listRemoteFiles();
 	    	
-	    }
-	    else
-	    {
-	    	System.out.printf("failed to delete the directory %s\n",remotepath);
-	    	System.out.print(miniClient.getReplyString());
-	    }
-		
-		
-		}
+	    	  }
+	    	  else
+	    	  {
+	    		  System.out.printf("failed to delete the directory %s\n",remotepath);
+	    		  System.out.print(miniClient.getReplyString());
+	    	  }
+	     }  
+	}
 	
 
     
