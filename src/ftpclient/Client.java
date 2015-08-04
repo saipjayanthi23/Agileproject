@@ -722,28 +722,24 @@ public class Client {
 		System.out.println("Enter the name of the directory to delete \n");
            String filename = console.nextLine();
         
-           Boolean savedremotedirectory=null;
+           boolean savedremotedirectory=false;
            try{
         	   savedremotedirectory=myClient.changeWorkingDirectory(filename);
-         	  //System.out.println(savedremotedirectory);
+         	             
+               if(filename.length()==0)
+			   {
+				 System.out.println("Path name cannot be blank. Please try again!");
+			   } 
+               else if(!savedremotedirectory)
+               {
+        	     System.out.println("invalid path/directory");
+               }
+		       else{
+		    	 myClient.changeWorkingDirectory("/");  
+           	     DeleteDirectory(myClient,filename);
+			     myClient.changeWorkingDirectory("/");
+			   }
            
-           if(filename.length()==0)
-			{
-				System.out.println("Path name cannot be blank. Please try again!");
-			}
-           if(!savedremotedirectory)
-           {
-        	   System.out.println("invalid path/directory");
-           }
-			else{
-         
-        	  System.out.printf("Deleting directory %s\n",filename);
-        	  
-        	 myClient.changeWorkingDirectory("/");
-        	 
-			
-			DeleteDirectory(myClient,filename);
-			}
            }catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -754,14 +750,14 @@ public class Client {
 	{
 		   
 		//	miniClient.changeWorkingDirectory(remotepath);
-		 boolean savedremotedirectory=false ;
+		 boolean savedremotedirectory=false;
+		          
 		 try
 		 {
 			 savedremotedirectory = miniClient.changeWorkingDirectory(remotepath);
 			 System.out.println(miniClient.getReplyString());
 			 
-	         	  //System.out.println(savedremotedirectory);
-		 }catch (IOException e) {
+	      }catch (IOException e) {
 					// TODO Auto-generated catch block
 				e.printStackTrace();
 		 }				
@@ -772,49 +768,45 @@ public class Client {
 	     }
 	     else
 	     {
-	    	  FTPFile[] fileList=miniClient.listFiles();		
-	    	  for(FTPFile file : fileList)
-	    	  {
-	    		  System.out.printf("The file %s\n" , file.getName());
+	    	 FTPFile[] fileList=miniClient.listFiles();
+	    	         
+	    	 for(FTPFile file : fileList)
+	    	 {
+	    	   System.out.printf("The file %s\n" , file.getName());
 	    		  
-	    		  if(file.isFile())
-	    		  {
-					System.out.printf("The file %s is being deleted \n" , file.getName());
-					miniClient.deleteFile(file.getName());
-	    		  }
-				
-			  }
-		  
-	    	  for(FTPFile file : fileList)	
-	    	  {
-	    		  if(file.isDirectory())
-	    		  {
-	    			  DeleteDirectory(miniClient,file.getName());
-	    		  }
+	    	   if(file.isFile())
+	    	   {
+			      System.out.printf("The file %s is being deleted \n" , file.getName());
+				  
+			      miniClient.deleteFile(file.getName());
+	    	    }
+				 
+		  	   if(file.isDirectory())
+	    	   {
+	    	    
+		  	     DeleteDirectory(miniClient,file.getName());
+	    	    }
 	    	  }
-			
-		
-			// out of the loops
+		  	  // out of for loop
 	     
-	    	  miniClient.changeWorkingDirectory("..");
-	    	  boolean success=miniClient.removeDirectory(remotepath);
-	    	  if(success)
-	    	  {
-	    		  System.out.printf("Successfully deleted the empty directory %s \n",remotepath);
-	    		  System.out.print(miniClient.getReplyString());
+	    	    miniClient.changeWorkingDirectory("..");
+	    	    String removedir= remotepath.substring(remotepath.lastIndexOf("/")+1, remotepath.length());
+	    		   
+	    	    boolean success=miniClient.removeDirectory(removedir);
+	    	    if(success)
+	    	    {
+	    		    System.out.printf("Successfully deleted the empty directory %s \n",removedir);
+	    		    System.out.print(miniClient.getReplyString());
 	    		  //listRemoteFiles();
-	    	
-	    	  }
-	    	  else
-	    	  {
-	    		  System.out.printf("failed to delete the directory %s\n",remotepath);
+	    	   	  }
+	    	       else
+	    	      {
+	    		  System.out.printf("failed to delete the directory %s\n",removedir);
 	    		  System.out.print(miniClient.getReplyString());
-	    	  }
+	    	      }
+	    		}   
 	     }  
-	}
-	
-
-    
+	    
     // story12 for multiple directories
 
     
