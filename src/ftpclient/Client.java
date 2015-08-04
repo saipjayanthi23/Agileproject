@@ -849,7 +849,7 @@ public class Client {
 
             else {
                 boolean success = false;
-                System.out.println("Enter new directory name:\n");
+                System.out.println("Enter new File/Directory name:\n");
                 String newname = console.nextLine();
                 // if no directory/filename name is given ie, simply enter key
                 // is pressed
@@ -891,7 +891,7 @@ public class Client {
                 System.out.println("File/Directory name cannot be blank. Please try again!!!");
 
             } else {
-                boolean success = false;
+                boolean success1 = false;
                 System.out.println("Enter new local file/directory name:\n");
                 String newname = console.nextLine();
 
@@ -904,9 +904,9 @@ public class Client {
 
                 File oldfile = new File(oldname);
                 File newfile = new File(newname);
-                success = oldfile.renameTo(newfile);
+                success1 = oldfile.renameTo(newfile);
 
-                if (success) {
+                if (success1) {
                     System.out.println(oldname + " was successfully renamed to: " + newname);
                 } else {
                     System.out.println("Failed to rename local " + oldname);
