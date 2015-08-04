@@ -1002,63 +1002,80 @@ public class Client {
 
         boolean notquit = true;
         while (loginres && notquit) {
-            System.out.println("\nPick an option:\n1. List files and directories on remote.\n"
-                    + "2. List files and directories on local system\n"
-                    + "3. Logoff from server.\n" + "4. Get file(s) from remote server. (download) \n"
-                    + "5. Put file(s) on remote server. (upload) \n" + "6. Create directory on remote server. \n"
-                    + "7. Delete files on remote server. \n" + "8. Delete nested directory(s) on remote server \n"
-                    
-                    + "10.Rename file/directory on local machine \n" + "11.Rename file/directory on remote server \n"
-                    + "12. change directory (for create nested directories) \n");
+            System.out.println("\nFTP Server Operation: \n" +
+            		"\t1. Logoff \n" +
+            		"\t2. List File and Directory \n" +
+            		"\t3. Rename File or Directory \n" +
+            		"\t4. Create Directory \n" + 	// our story doesn't care for "files"
+            		"\t5. Delete File \n" +
+            		"\t6. Delete Directory \n\n" +
+            		
+            		"FTP Client Operation: \n" +
+            		"\t11. Noop \n" +
+            		"\t12. List File and Directory \n" +
+            		"\t13. Rename File or Directory \n" +
+            		"\t14. Noop \n" +
+            		"\t15. Noop \n" +
+            		"\t16. File Upload \n" +
+            		"\t17. File Download \n\n");
 
             String choice = console.nextLine();
             switch (choice) {
             case "1":
-            	listRemoteFiles(USERINPUT);
+            	logoff();
                 break;
 
             case "2":
-            	listLocalFiles(USERINPUT);
+            	listRemoteFiles(USERINPUT); // files and directory
+            	
                 break;
 
             case "3":
-                logoff();
+            	renameRemoteFileandDirectories();
                 break;
 
             case "4":
-                fileDownload();
+            	createDirectory();			// don't care about "FILE"
                 break;
+                
             case "5":
-                fileUpload();
+            	deleteRemoteFiles();
                 break;
-
+                
             case "6":
-                createDirectory();
-                break;
-
-            case "7":
-                deleteRemoteFiles();
-                break;
-            case "8":
-                DelDir();
-                break;
-            
-
-            case "10":
-                renameLocalFileandDirectories();
-                break;
+            	DelDir();					// not to be confused with DeleteDirectory().. local
+            	break;
 
             case "11":
-                renameRemoteFileandDirectories();
+                ; // noop
                 break;
 
             case "12":
-                changeDirectory();
+            	listLocalFiles(USERINPUT); 	// files and directories
                 break;
+                
+            case "13":
+            	renameLocalFileandDirectories();
+                break;
+
+            case "14":
+                ; // noop
+                break;
+
+            case "15":
+            	; // noop
+                break;
+
+            case "16":
+            	fileUpload();
+                break;
+                
+            case "17":
+            	fileDownload();
+            	break;
 
             default:
                 System.out.println("Did not understand your selection.");
-
             }
         }
         System.out.println("Done");
