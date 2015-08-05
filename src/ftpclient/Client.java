@@ -658,37 +658,41 @@ public class Client {
     // method to merge delete directories and delete files
     public static void deldirfiles()
     {
-    	listRemoteFiles("."); 
-    	System.out.println("Enter the name of the file or directory to delete "
+    	try
+    	{
+    		listRemoteFiles("."); 
+    		System.out.println("Enter the name of the file or directory to delete "
                 + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
                 + " if the file is in current directory just enter the filename \n");
-         String filename = console.nextLine(); 
-         
-    	
-		try
-		{
-			 FTPFile[] fileList = myClient.listFiles();
-			 for(FTPFile file : fileList)
-			 {
-				 if(filename==file.getName())
-				 {
-					 if(file.isFile())
-					 {
-						 deleteRemoteFiles(filename);
-					 }
-					 else if(file.isDirectory())
-					 {
-						 DelDir(filename);
-    		    	 }
-					 else
-					 {
-						 System.out.println("file not found ..Please try again!!!");
-					 }
-				 }
-    		  }
-		} catch (IOException e) {
+    		String filename = console.nextLine(); 
+            try
+            {
+            	FTPFile[] fileList = myClient.listFiles();
+            	for(FTPFile file : fileList)
+            	{
+            		if(filename==file.getName())
+            		{
+            			if(file.isFile())
+            			{
+            				deleteRemoteFiles(filename);
+            			}
+            			else if(file.isDirectory())
+            			{
+            				DelDir(filename);
+            			}
+            			else
+					 	{
+            				System.out.println("file not found ..Please try again!!!");
+					 	}
+            		}
+            	}
+            } catch (IOException e) {
 			// TODO Auto-generated catch block
-			e.printStackTrace();
+            	e.printStackTrace();
+            }
+    	}
+		catch (Exception e1){
+			e1.printStackTrace();
 		}
     }
 
@@ -825,26 +829,7 @@ public class Client {
 	    		}   
 	     }  
 	    
-    // story12 for multiple directories
-
-    
-    public static boolean checkDirectoryExists(String filePath) throws IOException {
-        // boolean directoryExists = myClient.changeWorkingDirectory(filePath);
-        boolean directoryExists = false;
-        FTPFile[] subFiles = myClient.listFiles();
-        for (FTPFile aFile : subFiles) {
-            String details = aFile.getName();
-            if ((aFile.isDirectory()) && details.equals(filePath)) {
-
-                directoryExists = true;
-
-            }
-
-        }
-        return directoryExists;
-
-    }
-
+   
     // Story 13 --rename remote file and directories
     // example:give path as--- parent/child/child0(if we have to rename child0
     // to child7)
