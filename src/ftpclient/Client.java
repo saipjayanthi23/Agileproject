@@ -91,8 +91,9 @@ public class Client {
         }
     }
 
-    // This is to list remote files in the current working directory and is used
-    // as a submodule in all the other methods of this class
+    // I have only kept this piece of code in case something breaks, 
+    //we should probably delete this if nothing breaks after everybody's tests
+    /*
     public static void listRemoteFiles() {
         
        
@@ -117,16 +118,15 @@ public class Client {
             System.out.println("listRemoteFiles(): Unexpected exception");
             e.printStackTrace();
         }
-    }
+    }*/
     
-    // Story 3 - This is to list all the remote files within the hierarchy of the current directory in a recursive fashion.
-    //This method is accessed only by inputing  option 1.
+    // This is to list remote files in the the given path and is called in the other methods of this class
     public static void listRemoteFiles(String directory) {
         
-        
+        String printDir = (directory.equals("."))? "root":directory;
         FTPFile[] files;
         try {
-        	System.out.println("List of Remote Files in "+ directory +":");
+        	System.out.println("List of Remote Files in "+ printDir +":");
             files = myClient.listFiles("/"+directory);
             // iterates over the files and prints details for each
             DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
@@ -147,23 +147,23 @@ public class Client {
         }
     
     }
-
-    public static void listRemoteFiles(int mode){
-    	if(mode == USERINPUT){
-    		System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
-    		String path = console.nextLine();
-    		if(path.length()!=0){	
-				if(checkDirectoryExistsOnPath(path)){
-					listRemoteFiles(path);
-				}
-				else{
-					System.out.println("The entered path does not exist on remote.");
-				}
-    		}
-    		else{
-    			listRemoteFiles();
-    		}	
-    	}
+    // Story 3 - This is to list all the remote files in a path given by the user..
+    //This method is accessed only by inputing  option 2.
+    public static void listRemoteFilesToUser(){
+		System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
+		String path = console.nextLine();
+		if(path.length()!=0){	
+			if(checkDirectoryExistsOnPath(path)){
+				listRemoteFiles(path);
+			}
+			else{
+				System.out.println("The entered path does not exist on remote.");
+			}
+		}
+		else{
+			listRemoteFiles(".");
+		}	
+    	
     }
     
  // Story 4
@@ -439,7 +439,10 @@ public class Client {
     }
 
    public static void fileUpload() {
-
+	   //SAMINA QUESTION FOR CODE REVIEW: 
+	   //So I guess, we now do not offer the user any way to upload to a given path 
+	   //(especially, since we removed 'change directory' option).
+	   //We always upload to root, correct?
 	    int j=0;
         System.out.println("Enter file name to upload:");
         String stringfiles = console.nextLine();
@@ -480,7 +483,7 @@ public class Client {
                             System.out.printf("Upload %s completed.\n", localFilePath);
                         else
                             System.out.printf("Upload %s FAILED.\n", localFilePath);
-                    	listRemoteFiles();
+                    	listRemoteFiles(".");
                     } 
                    // nested path! walk the Path on remote server by changing the working directory recursively
                     else { 
@@ -594,11 +597,11 @@ public class Client {
 
                     if (ch1 != -1) {
                         createNestedDirectory(dirName, "\\");
-                        listRemoteFiles();
+                        listRemoteFiles(".");
 
                     } else {
                         createNestedDirectory(dirName, "/");
-                        listRemoteFiles();
+                        listRemoteFiles(".");
 
                     }
 
@@ -619,7 +622,7 @@ public class Client {
                     e.printStackTrace();
                 }
                 if (replycode) {
-                    listRemoteFiles();
+                    listRemoteFiles(".");
                     System.out.println("Directory created Successfully: ");
 
                 } else {
@@ -699,7 +702,11 @@ public class Client {
             }
 
             if (replycode) {
-                listRemoteFiles();
+            	//SAMINA QUESTION FOR CODE REVIEW: 
+            	//Should we be listing remote files in the root, especially if the user deleted something 
+            	//along a path? I think we can get away with not listing anything and have the user manually check the
+            	//listing along the path they want if they really need to cross check.
+                listRemoteFiles(".");
                 System.out.println("File deleted Successfully.");
             } else {
                 System.out.println("File not deleted.Please try again");
@@ -718,7 +725,7 @@ public class Client {
     // to call removeRemoteDirectories()
     public static void DelDir()
 	{
-		listRemoteFiles();
+		listRemoteFiles(".");
 		System.out.println("Enter the name of the directory to delete \n");
            String filename = console.nextLine();
         
@@ -834,7 +841,7 @@ public class Client {
     // if filename give extension(example: file1.txt)
     public static void renameRemoteFileandDirectories() {
 
-        listRemoteFiles();
+        listRemoteFiles(".");
 
         try {
 
@@ -932,7 +939,7 @@ public class Client {
         }
         if (exist) {
             System.out.println("Directory changed to " + cdpath);
-            listRemoteFiles();
+            listRemoteFiles(cdpath);
         } else {
             System.out.println("Directory cannot be changed. Please try again");
         }
@@ -952,8 +959,8 @@ public class Client {
     
     public static void main(String[] args) {
 
-        // String server = "10.200.27.150";
-        String server = "71.237.177.239";
+        String server = "10.200.200.55";
+        //String server = "71.237.177.239";
         int port = 21;
         boolean connectres = false;
         boolean loginres = false;
@@ -1026,7 +1033,7 @@ public class Client {
                 break;
 
             case "2":
-            	listRemoteFiles(USERINPUT); // files and directory
+            	listRemoteFilesToUser(); // files and directory
             	
                 break;
 
