@@ -22,7 +22,6 @@ import org.apache.commons.net.ftp.FTPReply;
 public class Client {
     static FTPClient myClient;
     static Scanner console = new Scanner(System.in);
-    static int USERINPUT = 1;
     // Method to establish the connection with FTP server and login with user
     // details
 
@@ -91,34 +90,6 @@ public class Client {
         }
     }
 
-    // I have only kept this piece of code in case something breaks, 
-    //we should probably delete this if nothing breaks after everybody's tests
-    /*
-    public static void listRemoteFiles() {
-        
-       
-        FTPFile[] files;
-        try {
-        	System.out.println("List of Remote Files in "+ myClient.printWorkingDirectory()+":");
-            files = myClient.listFiles();
-            // iterates over the files and prints details for each
-            DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-
-            for (FTPFile file : files) {
-                String details = file.getName();
-                if (file.isDirectory()) {
-                    details = "[" + details + "]";
-                }
-                details += "\t\t" + file.getSize();
-                details += "\t\t" + dateFormater.format(file.getTimestamp().getTime());
-                System.out.println(details);
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            System.out.println("listRemoteFiles(): Unexpected exception");
-            e.printStackTrace();
-        }
-    }*/
     
     // This is to list remote files in the the given path and is called in the other methods of this class
     public static void listRemoteFiles(String directory) {
@@ -166,41 +137,27 @@ public class Client {
     	
     }
     
- // Story 4
-    public static void listLocalFiles(int mode) {
-    	if(mode == USERINPUT){
-	    	System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
-	    	String path = console.nextLine();
-	    	File curDir;
-			if(path.length()!=0){
-				curDir = new File(path);
-			}
-			else{
-				curDir = new File(".");
-			}
-			if(curDir.exists() && curDir.isDirectory()){
-		        File[] files = curDir.listFiles();
-		
-		        for (File file : files) {
-		            String details = file.getName();
-		            if (file.isDirectory()) {
-		                details = "[" + details + "]";
-		            }
-		            System.out.println(details);
-		        }
-			}
-			else{
-				System.out.println("Could not list for the entered path. Please recheck and try again.");
-			}
-    	}
+ // Story 4: Accessible to user only through 
+    public static void listLocalFilesToUser() {
+    	System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
+    	String path = console.nextLine();
+    	
+		if(path.length()!=0){
+			listLocalFiles(path);
+		}
+		else{
+			listLocalFiles(".");
+		}
     }
     
-    public static void listLocalFiles() {
-    	File curDir = new File(".");
-		if(curDir.exists() && curDir.isDirectory()){
+    public static void listLocalFiles(String path) {
+    	File curDir = new File(path);
+		if(curDir.exists() && curDir.isDirectory())
+		{
 	        File[] files = curDir.listFiles();
 	
-	        for (File file : files) {
+	        for (File file : files) 
+	        {
 	            String details = file.getName();
 	            if (file.isDirectory()) {
 	                details = "[" + details + "]";
@@ -208,7 +165,8 @@ public class Client {
 	            System.out.println(details);
 	        }
 		}
-		else{
+		else
+		{
 			System.out.println("Could not list for the entered path. Please recheck and try again.");
 		}
     }
@@ -887,7 +845,7 @@ public class Client {
 
     {
 
-        listLocalFiles();
+        listLocalFiles(".");
 
         try {
             System.out.println("Enter name of the file/directory to rename:");
@@ -959,8 +917,8 @@ public class Client {
     
     public static void main(String[] args) {
 
-        String server = "10.200.200.55";
-        //String server = "71.237.177.239";
+        //String server = "127.0.0.1";
+        String server = "71.237.177.239";
         int port = 21;
         boolean connectres = false;
         boolean loginres = false;
@@ -1058,7 +1016,7 @@ public class Client {
                 break;
 
             case "12":
-            	listLocalFiles(USERINPUT); 	// files and directories
+            	listLocalFilesToUser(); 	// files and directories
                 break;
                 
             case "13":
