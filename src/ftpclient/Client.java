@@ -654,14 +654,51 @@ public class Client {
             }
         }
     }
-
-    // story 10 delete files from remote server
-    public static void deleteRemoteFiles() {
-        // Get the name of the directory to be created from user
-        System.out.println("Enter the name of the file to delete "
+    
+    // method to merge delete directories and delete files
+    public static void deldirfiles()
+    {
+    	listRemoteFiles("."); 
+    	System.out.println("Enter the name of the file or directory to delete "
                 + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
                 + " if the file is in current directory just enter the filename \n");
-        String filename = console.nextLine();
+         String filename = console.nextLine(); 
+         
+    	
+		try
+		{
+			 FTPFile[] fileList = myClient.listFiles();
+			 for(FTPFile file : fileList)
+			 {
+				 if(filename==file.getName())
+				 {
+					 if(file.isFile())
+					 {
+						 deleteRemoteFiles(filename);
+					 }
+					 else if(file.isDirectory())
+					 {
+						 DelDir(filename);
+    		    	 }
+					 else
+					 {
+						 System.out.println("file not found ..Please try again!!!");
+					 }
+				 }
+    		  }
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
+
+    // story 10 delete files from remote server
+    public static void deleteRemoteFiles(String filename) {
+        // Get the name of the directory to be created from user
+//        System.out.println("Enter the name of the file to delete "
+//                + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
+//                + " if the file is in current directory just enter the filename \n");
+//        String filename = console.nextLine();
         Boolean replycode = null;
         if (filename.length() == 0) {
             System.out.println("File name cannot be blank. Please try again!");
@@ -697,11 +734,11 @@ public class Client {
     // removeRemoteDirectory() but to delete multiple directories [Test] and
     // [Folder] we need
     // to call removeRemoteDirectories()
-    public static void DelDir()
+    public static void DelDir(String filename)
 	{
-		listRemoteFiles(".");
-		System.out.println("Enter the name of the directory to delete \n");
-           String filename = console.nextLine();
+//		listRemoteFiles(".");
+//		System.out.println("Enter the name of the directory to delete \n");
+//           String filename = console.nextLine();
         
            boolean savedremotedirectory=false;
            try{
@@ -989,7 +1026,7 @@ public class Client {
             		"\t3. Rename File or Directory \n" +
             		"\t4. Create Directory \n" + 	// our story doesn't care for "files"
             		"\t5. Delete File \n" +
-            		"\t6. Delete Directory \n\n" +
+            		
             		
             		"FTP Client Operation: \n" +
             		"\t11. Noop \n" +
@@ -1000,7 +1037,7 @@ public class Client {
             		"\t16. Noop \n" +
             		"\t17. File Upload \n" +
             		"\t18. File Download \n\n");
-
+//"\t6. Delete Directory \n\n" +
             String choice = console.nextLine();
             switch (choice) {
             case "1":
@@ -1021,12 +1058,12 @@ public class Client {
                 break;
                 
             case "5":
-            	deleteRemoteFiles();
+            	deldirfiles();
                 break;
                 
-            case "6":
-            	DelDir();					// not to be confused with DeleteDirectory().. local
-            	break;
+//            case "6":
+//            	DelDir();					// not to be confused with DeleteDirectory().. local
+//            	break;
 
             case "11":
                 ; // noop
