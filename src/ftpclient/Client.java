@@ -182,12 +182,22 @@ public class Client {
             return false; // illegal nested. So, file not exists.
         else if (rc == 0) { // not nested. So check in current dir
             String[] rfiles = myClient.listNames();
-            return Arrays.asList(rfiles).contains(filePath);
+            exist = Arrays.asList(rfiles).contains(filePath);
+            // attempt to change directory. If we can
+            // then the the input is a directory. Abort!
+            if (exist) {
+            	if (myClient.changeWorkingDirectory(filePath)) {
+            		System.out.printf ("Downloading directory %s is not suppported. ", filePath);
+            		System.out.println("Treating it as file not exist on remote server!!! ");
+            		exist = false; // So, pretend it doesn't exist!
+            	}
+            }
+            return exist;
         } else { // nested path! walk the filePath
             String[] dirPath = null;
-            dirPath = filePath.split("\\\\");
+            dirPath = filePath.split("\\\\"); // Windows!
             if (dirPath.length == 1) {
-                dirPath = filePath.split("/");
+                dirPath = filePath.split("/"); // Mac!
             }
             if (dirPath != null && dirPath.length > 0) {
                 for (String dir : dirPath) {
@@ -235,8 +245,9 @@ public class Client {
     }
 
     // NOTE: this only work for downloading files. Do not pass a directory!
+    // Story 5 and 6, get a file and get multiple files.
     public static void fileDownload() {
-        System.out.println("Enter file name to download:");
+        System.out.println("Enter file name(s) to download:");
         String stringfiles = console.nextLine();
         String savedRemoteDir = null;
         try {
@@ -401,7 +412,12 @@ public class Client {
 	   //So I guess, we now do not offer the user any way to upload to a given path 
 	   //(especially, since we removed 'change directory' option).
 	   //We always upload to root, correct?
-	    int j=0;
+	   
+	   // What about asking for one or two inputs in one line, ie:  <file> <destination/path/to/put/file>
+	   // or just <file>
+	   // if only <file> is specified, put it in the current dir. else put it in a specific path.
+	   // too late for that?
+	    
         System.out.println("Enter file name to upload:");
         String stringfiles = console.nextLine();
 
@@ -981,8 +997,9 @@ public class Client {
             		"\t13. Rename File or Directory \n" +
             		"\t14. Noop \n" +
             		"\t15. Noop \n" +
-            		"\t16. File Upload \n" +
-            		"\t17. File Download \n\n");
+            		"\t16. Noop \n" +
+            		"\t17. File Upload \n" +
+            		"\t18. File Download \n\n");
 
             String choice = console.nextLine();
             switch (choice) {
@@ -1030,12 +1047,16 @@ public class Client {
             case "15":
             	; // noop
                 break;
-
+                
             case "16":
+            	; // noop
+            	break;
+
+            case "17":
             	fileUpload();
                 break;
                 
-            case "17":
+            case "18":
             	fileDownload();
             	break;
 
