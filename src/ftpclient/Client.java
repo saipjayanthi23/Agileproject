@@ -586,8 +586,7 @@ public class Client {
                     e.printStackTrace();
                 }
                 if (replycode) {
-                    listRemoteFiles(".");
-                    System.out.println("Directory created Successfully: ");
+                	System.out.println("Directory created Successfully: ");
 
                 } else {
                     System.out.println("Failed to create directory");
@@ -648,62 +647,32 @@ public class Client {
     // method to merge delete directories and delete files
     public static void deldirfiles()
     {
-    	try
-    	{
-    		//listRemoteFiles("."); 
-    		System.out.println("Enter the name of the file or directory to delete "
+    	 try {
+    		 listRemoteFiles("."); 
+    		 System.out.println("Enter the name of the file or directory to delete "
                 + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
                 + " if the file is in current directory just enter the filename \n");
-    		String filename = console.nextLine(); 
-    		File f = new File(filename);
-    		
-    		System.out.println(f);
-    		 try
-             {
+    		 String filename = console.nextLine(); 
+       		 try{
              	FTPFile[] fileList = myClient.listFiles();
              	for(FTPFile file : fileList)
-             	{
-             		if(f.getName()==file.getName())
-             		{
-             			if(file.isFile())
-             			{
+             	{             		
+             		if(filename.equals(file.getName())){
+             			if(file.isFile()){
              				deleteRemoteFiles(filename);
              			}
-             			else if(file.isDirectory())
-             			{
+             			else if(file.isDirectory()){
              				DelDir(filename);
              			}
-             			else
- 					 	{
+             			else{
              				System.out.println("file not found ..Please try again!!!");
  					 	}
              		}
              	}
-             } catch (IOException e) {
- 			// TODO Auto-generated catch block
-             	e.printStackTrace();
-             }
-//            if(f.exists())
-//            {
-//            	if(f.isFile())
-//        		{
-//        			deleteRemoteFiles(filename);
-//        		}
-//        		else if(f.isDirectory())
-//        		{
-//        			DelDir(filename);
-//        		}
-//        		else
-//				 {
-//        			System.out.println("file not found ..Please try again!!!");
-//				 }
-//             }
-//             else
-//             {
-//            	System.out.println("the path entered does not exist..Please try again!");
-//             }
-//            	
-            
+              } catch (IOException e) {
+            	  // TODO Auto-generated catch block
+            	  e.printStackTrace();
+              }            
     	}
 		catch (Exception e1){
 			e1.printStackTrace();
