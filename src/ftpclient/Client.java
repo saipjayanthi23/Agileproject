@@ -561,11 +561,11 @@ public class Client {
 
                     if (ch1 != -1) {
                         createNestedDirectory(dirName, "\\");
-                        listRemoteFiles(".");
+                      //  listRemoteFiles(".");
 
                     } else {
                         createNestedDirectory(dirName, "/");
-                        listRemoteFiles(".");
+                      //  listRemoteFiles(".");
 
                     }
 
@@ -988,7 +988,7 @@ public class Client {
             		"\t2. List File and Directory \n" +
             		"\t3. Rename File or Directory \n" +
             		"\t4. Create Directory \n" + 	// our story doesn't care for "files"
-            		"\t5. Delete File \n" +
+            		"\t5. Delete File or directory \n" +
             		
             		
             		"FTP Client Operation: \n" +
@@ -1000,7 +1000,7 @@ public class Client {
             		"\t16. Noop \n" +
             		"\t17. File Upload \n" +
             		"\t18. File Download \n\n");
-//"\t6. Delete Directory \n\n" +
+ 
             String choice = console.nextLine();
             switch (choice) {
             case "1":
@@ -1024,10 +1024,6 @@ public class Client {
             	deldirfiles();
                 break;
                 
-//            case "6":
-//            	DelDir();					// not to be confused with DeleteDirectory().. local
-//            	break;
-
             case "11":
                 ; // noop
                 break;
