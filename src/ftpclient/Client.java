@@ -119,7 +119,7 @@ public class Client {
     
     }
     // Story 3 - This is to list all the remote files in a path given by the user..
-    //This method is accessed only by inputing  option 2.
+    // This method is accessed only by inputing  option 2.
     public static void listRemoteFilesToUser(){
 		System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
 		String path = console.nextLine();
@@ -137,7 +137,7 @@ public class Client {
     	
     }
     
- // Story 4: Accessible to user only through 
+    // Story 4: Accessible to user only through the menu option
     public static void listLocalFilesToUser() {
     	System.out.println("Please enter the path for which you need to see a listing. Leave empty for the current directory:");
     	String path = console.nextLine();
@@ -244,9 +244,11 @@ public class Client {
         return flag;
     }
 
-    // NOTE: this only work for downloading files. Do not pass a directory!
+
     // Story 5 and 6, get a file and get multiple files.
+    // NOTE: this only work for downloading files. Do not pass a directory!
     public static void fileDownload() {
+    	
         System.out.println("Enter file name(s) to download:");
         String stringfiles = console.nextLine();
         String savedRemoteDir = null;
@@ -292,9 +294,7 @@ public class Client {
                     dirPath = remotefilename.split("\\\\");
                     int j = 0;
                     if (dirPath.length == 1) {
-                        dirPath = remotefilename.split("/");
-                    }
-                    if (dirPath.length == 1) {
+                    	dirPath = remotefilename.split("/");
                         File check = new File(dirPath[0]);
                         if (check.isDirectory()) {
                             System.out.printf("Downloading directory, %s, is not supported.", dirPath[0]);
@@ -341,7 +341,7 @@ public class Client {
                                         boolean success = myClient.retrieveFile(remotefilename, outputstream);
                                         outputstream.close();
                                         if (success) {
-                                            // FIXME: for some reasons the
+                                            // NOTE: for some reasons the
                                             // downloaded file is put in the
                                             // savedLocalDir
                                             // it's not in the expected working
@@ -387,7 +387,6 @@ public class Client {
         }
     }
 
-    // Stories 7 & 8 put file(s) on remote server
 
     static boolean checkFileExistsLocally(String filePath) throws FileNotFoundException,IOException {
 
@@ -406,10 +405,11 @@ public class Client {
             	  return false; 
       }
     }
-    //Samina: This code for fileUpload() was last updated by Sai. No changes made by me have been preserved.
+    
+    // story 7 & 8
     public static void fileUpload() {
  	    
-         System.out.println("Enter file name to upload:");
+         System.out.println("Enter file name(s) to upload:");
          String stringfiles = console.nextLine();
 
          String savedRemoteDir = null;
@@ -481,13 +481,12 @@ public class Client {
                                      	        exist = myClient.changeWorkingDirectory(dir +"/");
                                      	        
                                             } catch (IOException e) {
-                                               // TODO Auto-generated catch block
                                                  e.printStackTrace();
                                             }
                                         }    
                                        k++;
                                       }
-                                 	// if it a file name 
+                                 	// if it's a file name 
                                  	else { 
                                  		inputstream = new FileInputStream(localFilePath);
                                  		String remoteFileName = dir;
@@ -518,11 +517,11 @@ public class Client {
     }    
     // story 9 create directories on remote server
     public static void createDirectory() {
-        // Get the name of the directory to be created from user
+ 
         System.out.println("Enter name of the directory to create:");
         String dirName = console.nextLine();
 
-        Boolean replycode = null, flag = false;
+        Boolean replycode = false, flag = false;
         int ch1 = 0, ch2 = 0;
         int checks[] = new int[7];
         /*
@@ -561,11 +560,9 @@ public class Client {
 
                     if (ch1 != -1) {
                         createNestedDirectory(dirName, "\\");
-                      //  listRemoteFiles(".");
 
                     } else {
                         createNestedDirectory(dirName, "/");
-                      //  listRemoteFiles(".");
 
                     }
 
@@ -595,13 +592,8 @@ public class Client {
         }
     }
 
-    // create nested directories
-
     public static void createNestedDirectory(String path, String c) {
         boolean exist = false, reply = false;
-        // Get the name of the directory to be created from user
-        // System.out.println ("Enter name of the directory to create:");
-        // String path = console.nextLine();
         String[] dirPath;
         if (c == "\\") {
             dirPath = path.split("\\\\");
@@ -638,7 +630,6 @@ public class Client {
             try {
                 exist = myClient.changeWorkingDirectory("/");
             } catch (IOException e) {
-                // TODO Auto-generated catch block
                 e.printStackTrace();
             }
         }
@@ -647,8 +638,7 @@ public class Client {
     // method to merge delete directories and delete files
     public static void deldirfiles()
     {
-    	 try {
-    		 listRemoteFiles("."); 
+    	 try { 
     		 System.out.println("Enter the name of the file or directory to delete "
                 + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
                 + " if the file is in current directory just enter the filename \n");
@@ -670,7 +660,6 @@ public class Client {
              		}
              	}
               } catch (IOException e) {
-            	  // TODO Auto-generated catch block
             	  e.printStackTrace();
               }            
     	}
@@ -709,13 +698,6 @@ public class Client {
     }
 
     // story 12 delete directory from remote server
-    // removing single directory and multiple directories are separate method to
-    // distinguish
-    // between [Test folder] and [Test] [Folder]. To remove the first folder we
-    // need to call
-    // removeRemoteDirectory() but to delete multiple directories [Test] and
-    // [Folder] we need
-    // to call removeRemoteDirectories()
     public static void DelDir(String filename)
 	{
 //		listRemoteFiles(".");
@@ -815,8 +797,6 @@ public class Client {
     // if filename give extension(example: file1.txt)
     public static void renameRemoteFileandDirectories() {
 
-        listRemoteFiles(".");
-
         try {
 
             System.out.println("Enter name of the file/directory to rename:");
@@ -839,7 +819,6 @@ public class Client {
 
                 }
 
-                // boolean success1 = false;
                 success = myClient.rename(oldname, newname);
                 if (success) {
                     System.out.println(oldname + " was successfully renamed to: " + newname);
@@ -857,11 +836,7 @@ public class Client {
     // story 14 Rename local files and directories
     // example:give path as :--- localdirectory/file.txt
     // rename to:--localdirectory/file4.txt
-    public static void renameLocalFileandDirectories()
-
-    {
-
-        listLocalFiles(".");
+    public static void renameLocalFileandDirectories() {
 
         try {
             System.out.println("Enter name of the file/directory to rename:");
@@ -933,7 +908,6 @@ public class Client {
     
     public static void main(String[] args) {
 
-        //String server = "127.0.0.1";
         String server = "71.237.177.239";
         int port = 21;
         boolean connectres = false;
@@ -947,6 +921,7 @@ public class Client {
             System.exit(0);
 
         // Getting login details from the user.
+        // 3 invalid trials
         for (int i = 1; i <= 3; i++) {
             System.out.println("Enter the username");
             String user = console.nextLine();
@@ -973,7 +948,7 @@ public class Client {
                 continue;
         }
 
-        // Need this for downloading
+        // This is a protocol needed for downloading files
         try {
             myClient.setFileType(FTP.BINARY_FILE_TYPE);
             myClient.enterLocalPassiveMode();
@@ -1004,7 +979,7 @@ public class Client {
                 break;
 
             case "2":
-            	listRemoteFilesToUser(); // files and directory
+            	listRemoteFilesToUser(); 	// files and directory
             	
                 break;
 
