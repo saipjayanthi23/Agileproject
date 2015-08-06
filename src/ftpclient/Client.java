@@ -660,36 +660,60 @@ public class Client {
     {
     	try
     	{
-    		listRemoteFiles("."); 
+    		//listRemoteFiles("."); 
     		System.out.println("Enter the name of the file or directory to delete "
                 + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
                 + " if the file is in current directory just enter the filename \n");
     		String filename = console.nextLine(); 
-            try
-            {
-            	FTPFile[] fileList = myClient.listFiles();
-            	for(FTPFile file : fileList)
-            	{
-            		if(filename==file.getName())
-            		{
-            			if(file.isFile())
-            			{
-            				deleteRemoteFiles(filename);
-            			}
-            			else if(file.isDirectory())
-            			{
-            				DelDir(filename);
-            			}
-            			else
-					 	{
-            				System.out.println("file not found ..Please try again!!!");
-					 	}
-            		}
-            	}
-            } catch (IOException e) {
-			// TODO Auto-generated catch block
-            	e.printStackTrace();
-            }
+    		File f = new File(filename);
+    		
+    		System.out.println(f);
+    		 try
+             {
+             	FTPFile[] fileList = myClient.listFiles();
+             	for(FTPFile file : fileList)
+             	{
+             		if(f.getName()==file.getName())
+             		{
+             			if(file.isFile())
+             			{
+             				deleteRemoteFiles(filename);
+             			}
+             			else if(file.isDirectory())
+             			{
+             				DelDir(filename);
+             			}
+             			else
+ 					 	{
+             				System.out.println("file not found ..Please try again!!!");
+ 					 	}
+             		}
+             	}
+             } catch (IOException e) {
+ 			// TODO Auto-generated catch block
+             	e.printStackTrace();
+             }
+//            if(f.exists())
+//            {
+//            	if(f.isFile())
+//        		{
+//        			deleteRemoteFiles(filename);
+//        		}
+//        		else if(f.isDirectory())
+//        		{
+//        			DelDir(filename);
+//        		}
+//        		else
+//				 {
+//        			System.out.println("file not found ..Please try again!!!");
+//				 }
+//             }
+//             else
+//             {
+//            	System.out.println("the path entered does not exist..Please try again!");
+//             }
+//            	
+            
     	}
 		catch (Exception e1){
 			e1.printStackTrace();
@@ -717,12 +741,7 @@ public class Client {
             }
 
             if (replycode) {
-            	//SAMINA QUESTION FOR CODE REVIEW: 
-            	//Should we be listing remote files in the root, especially if the user deleted something 
-            	//along a path? I think we can get away with not listing anything and have the user manually check the
-            	//listing along the path they want if they really need to cross check.
-                listRemoteFiles(".");
-                System.out.println("File deleted Successfully.");
+            	System.out.println("File deleted Successfully.");
             } else {
                 System.out.println("File not deleted.Please try again");
             }
