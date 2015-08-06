@@ -665,7 +665,7 @@ public class Client {
              				DelDir(filename);
              			}
              			else{
-             				System.out.println("file not found ..Please try again!!!");
+             				System.out.println("file or directory not found ..Please try again!!!");
  					 	}
              		}
              	}
@@ -992,14 +992,10 @@ public class Client {
             		
             		
             		"FTP Client Operation: \n" +
-            		"\t11. Noop \n" +
-            		"\t12. List File and Directory \n" +
-            		"\t13. Rename File or Directory \n" +
-            		"\t14. Noop \n" +
-            		"\t15. Noop \n" +
-            		"\t16. Noop \n" +
-            		"\t17. File Upload \n" +
-            		"\t18. File Download \n\n");
+            		"\t11. List File and Directory \n" +
+            		"\t12. Rename File or Directory \n" +
+            		"\t13. File Upload \n" +
+            		"\t14. File Download \n\n");
  
             String choice = console.nextLine();
             switch (choice) {
@@ -1021,38 +1017,22 @@ public class Client {
                 break;
                 
             case "5":
-            	deldirfiles();
+            	deldirfiles();              // files and directories
                 break;
                 
             case "11":
-                ; // noop
-                break;
-
-            case "12":
             	listLocalFilesToUser(); 	// files and directories
                 break;
                 
-            case "13":
+            case "12":
             	renameLocalFileandDirectories();
                 break;
 
-            case "14":
-                ; // noop
-                break;
-
-            case "15":
-            	; // noop
-                break;
-                
-            case "16":
-            	; // noop
-            	break;
-
-            case "17":
+            case "13":
             	fileUpload();
                 break;
                 
-            case "18":
+            case "14":
             	fileDownload();
             	break;
 
