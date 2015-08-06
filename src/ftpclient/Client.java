@@ -406,17 +406,10 @@ public class Client {
             	  return false; 
       }
     }
-
+    
+    //Behaviour of fileUpload() has been modified.
+    //Now, a file can be uploaded from any local path to any remote path
    public static void fileUpload() {
-	   //SAMINA QUESTION FOR CODE REVIEW: 
-	   //So I guess, we now do not offer the user any way to upload to a given path 
-	   //(especially, since we removed 'change directory' option).
-	   //We always upload to root, correct?
-	   
-	   // What about asking for one or two inputs in one line, ie:  <file> <destination/path/to/put/file>
-	   // or just <file>
-	   // if only <file> is specified, put it in the current dir. else put it in a specific path.
-	   // too late for that?
 	    
         System.out.println("Enter file name to upload:");
         String stringfiles = console.nextLine();
@@ -445,74 +438,38 @@ public class Client {
                 } else if (!checkFileExistsLocally(localFilePath)) {
                 	System.out.println(localFilePath + "  is not a valid path / filename");
                     continue;
-                } else {
-                	int rv,k=0;
-                	rv = checkNested(localFilePath);
-                	// not nested. Upload the file in remote home directory
-                    if (rv == 0) { 
-                    	inputstream = new FileInputStream(localFilePath);
-                        boolean success = myClient.storeFile(localFilePath, inputstream);
-                        inputstream.close();
-                        if (success)
-                            System.out.printf("Upload %s completed.\n", localFilePath);
-                        else
-                            System.out.printf("Upload %s FAILED.\n", localFilePath);
-                    	listRemoteFiles(".");
+                } 
+                else 
+                {
+                	File curFile = new File(localFilePath);
+                	// not nested. Upload the file to remote
+                    if (curFile.exists() && curFile.isFile()) 
+                    { 
+                    	System.out.println("Enter directory path to which you wish to upload. Leave empty for root:");
+                    	String destination = console.nextLine();
+                    	destination = (destination.length()!=0)? destination : ".";
+                    	boolean exists = myClient.changeWorkingDirectory(destination);
+                    	
+                    	if(exists){
+                    		inputstream = new FileInputStream(curFile);
+                            boolean success = myClient.storeFile(curFile.getName(), inputstream);
+                            inputstream.close();
+                            if (success)
+                                System.out.printf("Upload %s completed.\n", localFilePath);
+                            else
+                                System.out.printf("Upload %s FAILED.\n", localFilePath);
+                    	}
+                    	else{
+                    		System.out.println("Directory you asked to upload to is invalid. Try again.");
+                    	}
+
+                    	//listRemoteFiles(".");
                     } 
-                   // nested path! walk the Path on remote server by changing the working directory recursively
-                    else { 
-                        String[] dirPath = null;
-                        dirPath = localFilePath.split("\\\\");
-                        if (dirPath.length == 1) {
-                            dirPath = localFilePath.split("/");
-                        }
-                        System.out.println("length is  "+ dirPath.length);
-                        if (dirPath != null && dirPath.length > 0) {
-                            for (String dir : dirPath) {
-                                try {
-                                	// check if it is a directory or file name
-                                	if (k!=(dirPath.length - 1)){
-                                       boolean exist = myClient.changeWorkingDirectory(dir);
-                                       // if there is no such directory exists, create directory
-                                       if (!exist && dir.length() != 0) {
-                                          try {
-                                               boolean reply = myClient.makeDirectory(dir);
-                                               if(reply){
-                                                         exist = myClient.changeWorkingDirectory(dir + "/");
-                                               }
-                                          } catch (IOException e) {
-                                               e.printStackTrace();
-                                          }
-                                       }
-                                       // if directory exists, then change the working directory
-                                       else {
-                                           try {
-                                    	        exist = myClient.changeWorkingDirectory(dir +"/");
-                                    	        
-                                           } catch (IOException e) {
-                                              // TODO Auto-generated catch block
-                                                e.printStackTrace();
-                                           }
-                                       }    
-                                      k++;
-                                     }
-                                	// if it a file name 
-                                	else { 
-                                		inputstream = new FileInputStream(localFilePath);
-                                		String remoteFileName = dir;
-                                        boolean success = myClient.storeFile(remoteFileName, inputstream);
-                                        inputstream.close();
-                                        if (success){
-                                            System.out.printf("Upload %s completed.\n", dir);
-                                        }else
-                                            System.out.printf("Upload %s FAILED.\n", dir);
-                                  	}
-                                } catch (IOException e) {
-                                       e.printStackTrace();
-                                }
-                             }
-                        }
-                    }
+                    // nested path! walk the Path on remote server by changing the working directory recursively
+                    else //else (rv==0)
+                    { 
+                    	System.out.println("Invalid file name.");
+                    }//end else
                 }
              // restore working directory on remote server
                 try {
