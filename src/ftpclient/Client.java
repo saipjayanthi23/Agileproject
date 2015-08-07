@@ -524,11 +524,11 @@ public class Client {
         Boolean replycode = false, flag = false;
         int ch1 = 0, ch2 = 0;
         int checks[] = new int[7];
-        /*
-         * The following code will check if the user tries to enter nested
-         * directories example Test\java. and if there are nested directories
-         * displays the appropriate messages if not directory is created
-         */
+        
+         // The following code will check if the user tries to enter nested
+         // directories example Test\java. and if there are nested directories
+         // displays the appropriate messages if not directory is created
+         
         if (dirName.length() == 0) {
             System.out.println("Directory name cannot be blank. Please try again");
         } else {
@@ -571,10 +571,10 @@ public class Client {
                 System.out.println("Directory name cannot contain /:*?\"<>| Please try again");
             } else {
 
-                /*
-                 * The following code is to create the directory in the current
-                 * directory on remote server
-                 */
+                 
+                 // The following code is to create the directory in the current
+                 // directory on remote server
+                 
                 try {
                     replycode = myClient.makeDirectory(dirName);
                     System.out.printf("%s %s", dirName, myClient.getReplyString());
@@ -635,47 +635,16 @@ public class Client {
         }
     }
     
-    // method to merge delete directories and delete files
-    public static void deldirfiles()
-    {
-    	 try { 
-    		 System.out.println("Enter the name of the file or directory to delete "
-                + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
-                + " if the file is in current directory just enter the filename \n");
-    		 String filename = console.nextLine(); 
-       		 try{
-             	FTPFile[] fileList = myClient.listFiles();
-             	for(FTPFile file : fileList)
-             	{             		
-             		if(filename.equals(file.getName())){
-             			if(file.isFile()){
-             				deleteRemoteFiles(filename);
-             			}
-             			else if(file.isDirectory()){
-             				DelDir(filename);
-             			}
-             			else{
-             				System.out.println("file or directory not found ..Please try again!!!");
- 					 	}
-             		}
-             	}
-              } catch (IOException e) {
-            	  e.printStackTrace();
-              }            
-    	}
-		catch (Exception e1){
-			e1.printStackTrace();
-		}
-    }
+   
 
     // story 10 delete files from remote server
-    public static void deleteRemoteFiles(String filename) {
-        // Get the name of the directory to be created from user
-//        System.out.println("Enter the name of the file to delete "
-//                + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
-//                + " if the file is in current directory just enter the filename \n");
-//        String filename = console.nextLine();
-        Boolean replycode = null;
+    public static void deleteRemoteFiles() {
+       
+        System.out.println("Enter the name of the file to delete "
+                + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
+                + " if the file is in current directory just enter the filename \n");
+        String filename = console.nextLine();
+        Boolean replycode = false;
         if (filename.length() == 0) {
             System.out.println("File name cannot be blank. Please try again!");
         } else {
@@ -698,11 +667,11 @@ public class Client {
     }
 
     // story 12 delete directory from remote server
-    public static void DelDir(String filename)
+    public static void delDir()
 	{
-//		listRemoteFiles(".");
-//		System.out.println("Enter the name of the directory to delete \n");
-//           String filename = console.nextLine();
+
+		   System.out.println("Enter the name of the directory to delete \n");
+           String filename = console.nextLine();
         
            boolean savedremotedirectory=false;
            try{
@@ -718,20 +687,19 @@ public class Client {
                }
 		       else{
 		    	 myClient.changeWorkingDirectory("/");  
-           	     DeleteDirectory(myClient,filename);
+           	     deleteDirectory(myClient,filename);
 			     myClient.changeWorkingDirectory("/");
 			   }
            
            }catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			   	e.printStackTrace();
 		}
 			
 	}
-	public static void DeleteDirectory(FTPClient miniClient, String remotepath) throws IOException 
+	public static void deleteDirectory(FTPClient miniClient, String remotepath) throws IOException 
 	{
 		   
-		//	miniClient.changeWorkingDirectory(remotepath);
+		
 		 boolean savedremotedirectory=false;
 		          
 		 try
@@ -740,7 +708,7 @@ public class Client {
 			 System.out.println(miniClient.getReplyString());
 			 
 	      }catch (IOException e) {
-					// TODO Auto-generated catch block
+					
 				e.printStackTrace();
 		 }				
 	          
@@ -766,28 +734,44 @@ public class Client {
 		  	   if(file.isDirectory())
 	    	   {
 	    	    
-		  	     DeleteDirectory(miniClient,file.getName());
+		  	     deleteDirectory(miniClient,file.getName());
 	    	    }
 	    	  }
 		  	  // out of for loop
 	     
 	    	    miniClient.changeWorkingDirectory("..");
-	    	    String removedir= remotepath.substring(remotepath.lastIndexOf("/")+1, remotepath.length());
-	    		   
-	    	    boolean success=miniClient.removeDirectory(removedir);
-	    	    if(success)
-	    	    {
-	    		    System.out.printf("Successfully deleted the empty directory %s \n",removedir);
-	    		    System.out.print(miniClient.getReplyString());
-	    		  //listRemoteFiles();
-	    	   	  }
-	    	       else
-	    	      {
-	    		  System.out.printf("failed to delete the directory %s\n",removedir);
-	    		  System.out.print(miniClient.getReplyString());
-	    	      }
-	    		}   
-	     }  
+	    	    try{
+	    	    	int ch1 = remotepath.indexOf('\\');
+		            int ch2 = remotepath.indexOf('/');
+		            String removedir="";
+		            if(ch1!=-1 && ch2==-1){
+		            	removedir= remotepath.substring(remotepath.lastIndexOf("\\")+1, remotepath.length());
+		            }else if (ch1==-1 && ch2!=-1){
+		            	removedir= remotepath.substring(remotepath.lastIndexOf("/")+1, remotepath.length());
+		            }else{
+		            	System.out.println("Directory path cannot contain both / and \\");
+		            }
+		    	    
+		    		   
+		    	    boolean success=miniClient.removeDirectory(removedir);
+		    	    if(success)
+		    	    {
+		    		    System.out.printf("Successfully deleted the empty directory %s \n",removedir);
+		    		    System.out.print(miniClient.getReplyString());
+		    		  
+		    	   	  }
+		    	       else
+		    	      {
+		    		  System.out.printf("failed to delete the directory %s\n",removedir);
+		    		  System.out.print(miniClient.getReplyString());
+		    	      }
+	    	    	
+	    	    }catch(Exception e){
+	    	    	e.printStackTrace();
+	    	    }
+	    	    
+	      }   
+	}  
 	    
    
     // Story 13 --rename remote file and directories
@@ -963,7 +947,8 @@ public class Client {
             		"\t2. List Files in a Directory \n" +
             		"\t3. Rename File or Directory \n" +
             		"\t4. Create Directory \n" + 	// our story doesn't care for "files"
-            		"\t5. Delete File or directory \n" +
+            		"\t5. Delete File  \n" +
+            		"\t6. Delete Directory \n" +
             		
             		
             		"FTP Client Operation: \n" +
@@ -992,8 +977,13 @@ public class Client {
                 break;
                 
             case "5":
-            	deldirfiles();              // files and directories
+            	deleteRemoteFiles();               
                 break;
+                
+            case "6":
+            	delDir();					// not to be confused with DeleteDirectory().. local
+            	break;
+     
                 
             case "11":
             	listLocalFilesToUser(); 	// files and directories
