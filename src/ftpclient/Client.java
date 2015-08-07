@@ -457,7 +457,7 @@ public class Client {
                          if (dirPath.length == 1) {
                              dirPath = localFilePath.split("/");
                          }
-                         System.out.println("length is  "+ dirPath.length);
+                         
                          if (dirPath != null && dirPath.length > 0) {
                              for (String dir : dirPath) {
                                  try {
@@ -577,13 +577,13 @@ public class Client {
                  */
                 try {
                     replycode = myClient.makeDirectory(dirName);
-                    System.out.print(myClient.getReplyString());
+                    System.out.printf("%s %s", dirName, myClient.getReplyString());
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
                 if (replycode) {
-                	System.out.println("Directory created Successfully: ");
+                	System.out.printf("%s directory created successfully", dirName);
 
                 } else {
                     System.out.println("Failed to create directory");
@@ -615,7 +615,7 @@ public class Client {
                     try {
 
                         reply = myClient.makeDirectory(dir);
-                        System.out.println(myClient.getReplyString());
+                        System.out.printf("%s %s", dir, myClient.getReplyString());
                         if (reply) {
                             exist = myClient.changeWorkingDirectory(dir);
 
@@ -960,14 +960,14 @@ public class Client {
         while (loginres && notquit) {
             System.out.println("\nFTP Server Operation: \n" +
             		"\t1. Logoff \n" +
-            		"\t2. List File and Directory \n" +
+            		"\t2. List Files in a Directory \n" +
             		"\t3. Rename File or Directory \n" +
             		"\t4. Create Directory \n" + 	// our story doesn't care for "files"
             		"\t5. Delete File or directory \n" +
             		
             		
             		"FTP Client Operation: \n" +
-            		"\t11. List File and Directory \n" +
+            		"\t11. List Files in a Directory \n" +
             		"\t12. Rename File or Directory \n" +
             		"\t13. File Upload \n" +
             		"\t14. File Download \n\n");
