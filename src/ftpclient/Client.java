@@ -948,7 +948,7 @@ public class Client {
             		"\t3. Rename File or Directory \n" +
             		"\t4. Create Directory \n" + 	// our story doesn't care for "files"
             		"\t5. Delete File  \n" +
-            		"\t6. Delete Directory \n" +
+            		
             		
             		
             		"FTP Client Operation: \n" +
@@ -980,9 +980,7 @@ public class Client {
             	deleteRemoteFiles();               
                 break;
                 
-            case "6":
-            	delDir();					// not to be confused with DeleteDirectory().. local
-            	break;
+           
      
                 
             case "11":
