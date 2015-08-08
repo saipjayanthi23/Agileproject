@@ -640,12 +640,11 @@ public class Client {
     // story 10 delete files from remote server
     public static void deleteRemoteFiles() {
        
-        System.out.println("Enter the name of the file to delete "
-                + "(with the path eg:\\test2\\ftp ,where ftp is the file to delete.\n"
-                + " if the file is in current directory just enter the filename \n");
+        System.out.println("Enter the filepath to delete \n"
+                + " if the file is in current directory: enter the filename \n");
         String filename = console.nextLine();
         Boolean replycode = false;
-        if (filename.length() == 0) {
+        if (filename.length() == 0 || filename.trim().isEmpty()) {
             System.out.println("File name cannot be blank. Please try again!");
         } else {
             try {
@@ -751,26 +750,6 @@ public class Client {
             e.printStackTrace();
         }
 
-    }
-
-    // change directory option 12.. can remove if not needed. added for testing
-    // story 9!!
-
-    public static void changeDirectory() {
-        System.out.println("enter the directory name or path(/ to go to root directory):");
-        String cdpath = console.nextLine();
-        Boolean exist = false;
-        try {
-            exist = myClient.changeWorkingDirectory(cdpath);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        if (exist) {
-            System.out.println("Directory changed to " + cdpath);
-            listRemoteFiles(cdpath);
-        } else {
-            System.out.println("Directory cannot be changed. Please try again");
-        }
     }
 
     public static boolean checkDirectoryExistsOnPath(String cdpath){
