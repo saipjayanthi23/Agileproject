@@ -451,7 +451,7 @@ public class Client {
                              System.out.printf("Upload %s completed.\n", localFilePath);
                          else
                              System.out.printf("Upload %s FAILED.\n", localFilePath);
-                     	listRemoteFiles(".");
+                     	 
                      } 
                     // nested path! walk the Path on remote server by changing the working directory recursively
                      else { 
@@ -647,7 +647,7 @@ public class Client {
         } else {
             try {
                 replycode = myClient.deleteFile(filename);
-                System.out.println(myClient.getReplyString());
+            
 
             } catch (IOException e) {
 
@@ -655,9 +655,9 @@ public class Client {
             }
 
             if (replycode) {
-            	System.out.println("File deleted Successfully.");
+            	System.out.println("'"+filename+"'"+" deleted Successfully.");
             } else {
-                System.out.println("File not deleted.Please try again");
+                System.out.println("'"+filename+"'" +" not deleted.Please try again");
             }
         }
 
@@ -686,7 +686,7 @@ public class Client {
 
             else {
                 boolean success = false;
-                System.out.println("Enter new File/Directory name:\n");
+                System.out.println("Enter new File/Directory name(Please enter the full path name of the file/Directory):\n");
                 String newname = console.nextLine();
                 // if no directory/filename name is given ie, simply enter key
                 // is pressed
@@ -724,7 +724,7 @@ public class Client {
 
             } else {
                 boolean success1 = false;
-                System.out.println("Enter new local file/directory name:\n");
+                System.out.println("Enter new local File/Directory name(Please enter the full path name of the file/Directory):\n");
                 String newname = console.nextLine();
 
                 // if no directory/filename name is given ie, simply enter key
