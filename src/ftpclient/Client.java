@@ -521,7 +521,7 @@ public class Client {
         System.out.println("Enter name of the directory to create:");
         String dirName = console.nextLine();
 
-        Boolean replycode = false, flag = false;
+        Boolean flag = false;
         int ch1 = 0, ch2 = 0;
         int checks[] = new int[7];
         
@@ -576,18 +576,13 @@ public class Client {
                  // directory on remote server
                  
                 try {
-                    replycode = myClient.makeDirectory(dirName);
+                    myClient.makeDirectory(dirName);
                     System.out.printf("%s %s", dirName, myClient.getReplyString());
 
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                if (replycode) {
-                	System.out.printf("%s directory created successfully", dirName);
-
-                } else {
-                    System.out.println("Failed to create directory");
-                }
+               
             }
         }
     }
