@@ -152,6 +152,7 @@ public class Client {
     
     public static void listLocalFiles(String path) {
     	File curDir = new File(path);
+    	DateFormat dateFormater = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 		if(curDir.exists() && curDir.isDirectory())
 		{
 	        File[] files = curDir.listFiles();
@@ -162,6 +163,8 @@ public class Client {
 	            if (file.isDirectory()) {
 	                details = "[" + details + "]";
 	            }
+	            details += "\t\t" + file.length();
+                details += "\t\t" + dateFormater.format(file.lastModified());
 	            System.out.println(details);
 	        }
 		}
